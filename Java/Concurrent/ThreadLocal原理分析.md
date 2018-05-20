@@ -38,7 +38,7 @@
 		// 在getMap()方法中会返回Thread的threadLocals字段，该字段默认是null的
         ThreadLocalMap map = getMap(t);
         if (map != null)
-          // 以键值对的形式将数据写入到哈希表中
+            // 以键值对的形式将数据写入到哈希表中
             map.set(this, value);
         else
 		    // 如果指定Thread对应的threadLocals字段为Null，就实例化一个
