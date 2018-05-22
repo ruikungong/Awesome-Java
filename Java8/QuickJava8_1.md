@@ -2,11 +2,11 @@
 
 ## 1¡¢¸ÅÀÀ
 
-Java8µÄ¸Ä½ø±ÈÀúÊ·ÉÏÈÎºÎÒ»´Î¸Ä±ä¶¼±È½ÏÉîÔ¶¡£JavaÔÚ¸Ä½øÆäÊµÒ²ÊÇ±à³ÌÓïÑÔÉúÌ¬±ä»¯µÄÔ­Òò¡£ÖîÈç´óÊý¾ÝÐèÒªÔÚ¶àºËÉÏÃæÔËÐÐ£¬¶øJava´ËÇ°ÊÇ²»Ö§³ÖÕâÖÖ²Ù×÷µÄ¡£
+Java8µÄ¸Ä½ø±ÈÀúÊ·ÉÏÈÎºÎÒ»´Î¸Ä±ä¶¼±È½ÏÉîÔ¶¡£Java²»¶Ï¸Ä½øÒ²ÊÇ±à³ÌÓïÑÔÉúÌ¬±ä»¯µÄÊ¹È»¡ª¡ªÖîÈç´óÊý¾ÝÐèÒªÔÚ¶àºËÉÏÃæÔËÐÐ£¬¶øJava´ËÇ°ÊÇ²»Ö§³ÖÕâÖÖ²Ù×÷µÄ¡£
 
 ÔÚJava8Ö®Ç°£¬Èç¹ûÏëÒªÀûÓÃ¶à¸ö¼ÆËã»úµÄÄÚºË£¬ÄãÒªÊ¹ÓÃÏß³Ì£¬²¢ÇÒÒª´¦Àí¸´ÔÓµÄÍ¬²½Âß¼­¡£µ«ÊÇÔÚJava8ÖÐ£¬Äã¿ÉÒÔºÜÈÝÒ×µØÊ¹ÓÃÁ÷ÈÃ×Ô¼ºµÄ´úÂëÔÚ¶à¸öÄÚºËÉÏÃæÖ´ÐÐ¡£
 
-´ËÍâ£¬Ëü»¹½è¼øÁËÆäËûÓïÑÔºÍ¿ªÔ´¿âµÄÄÚÈÝ£¬±ÈÈçScala¡¢GuavaµÈ¡£ÎÒÃÇ×Ü½áÒ»ÏÂJava8µÄÖ÷Òª¼¸¸ö¸Ä½ø£º
+´ËÍâ£¬Ëü»¹½è¼øÁËÆäËûÓïÑÔºÍ¿ªÔ´¿âµÄÄÚÈÝ£¬±ÈÈçScala¡¢GuavaµÈ¡£ÎÒÃÇ×Ü½áÒ»ÏÂJava8µÄÖ÷Òª¼¸¸öÌØÕ÷»òÕß¸Ä½ø£º
 
 1. º¯ÊýÊ½±à³ÌºÍLambda±í´ïÊ½£»
 2. Á÷(Stream)±à³Ì£»
@@ -20,11 +20,11 @@ Java8µÄ¸Ä½ø±ÈÀúÊ·ÉÏÈÎºÎÒ»´Î¸Ä±ä¶¼±È½ÏÉîÔ¶¡£JavaÔÚ¸Ä½øÆäÊµÒ²ÊÇ±à³ÌÓïÑÔÉúÌ¬±ä»¯µÄÔ
 ### 2.1 Lambda±í´ïÊ½»ù±¾Óï·¨
 
     (parameters) -> expression     // ±í´ïÊ½
-    (parameters) -> {statements;}  // Óï¾ä£¬Óï¾äÎ²´ø·ÖºÅµÄÇÒÒªÓÃ»¨À¨ºÅÀ¨ÆðÀ´
+    (parameters) -> {statements;}  // Óï¾ä£¬Óï¾äÎ²´ø·ÖºÅÇÒÒªÓÃ»¨À¨ºÅÀ¨ÆðÀ´
 
-ÉÏÃæÊÇLambdaµÄ»ù±¾Óï·¨£¬µÚÒ»ÐÐÖÐÊÇLambdaÖÐÊ¹ÓÃ±í´ïÊ½µÄÇé¿ö£¬µÚ¶þÐÐÖÐÊ½LambdaÖÐÊ¹ÓÃÓï¾äµÄÇé¿ö£¬Ö»Òª×¢ÒâÒ»ÏÂÓï¾äÐèÒªÓÃ»¨À¨ºÅÀ¨ÆðÀ´¼´¿É¡£
+ÉÏÃæÊÇLambdaµÄ»ù±¾Óï·¨£¬µÚÒ»ÐÐÖÐÊÇLambdaÖÐÊ¹ÓÃ±í´ïÊ½µÄÇé¿ö£¬µÚ¶þÐÐÖÐÊ½LambdaÖÐÊ¹ÓÃÓï¾äµÄÇé¿ö¡£
 
-ÏÂÃæÊÇÒ»Ð©½Ó¿ÚµÄ¶¨Òå£¬ÒÔ¼°Ê¹ÓÃLambda±í´ïÊ½
+ÏÂÃæÊÇÒ»Ð©Ê¹ÓÃLambda±í´ïÊ½µÄÊ¾Àý£º
 
     public static void main(String...args) {
 	    // ´´½¨¶ÔÏó
@@ -39,37 +39,11 @@ Java8µÄ¸Ä½ø±ÈÀúÊ·ÉÏÈÎºÎÒ»´Î¸Ä±ä¶¼±È½ÏÉîÔ¶¡£JavaÔÚ¸Ä½øÆäÊµÒ²ÊÇ±à³ÌÓïÑÔÉúÌ¬±ä»¯µÄÔ
         //        Object object = Employee::new;
     }
 
-    private static int cal(int a, int b) {
-        return a + b;
-    }
-	
-	@FunctionalInterface
-    public interface ICreateObject {
-        Employee create();
-		default void method() {}
-    }
-
-    public interface IExpression {
-        void filter(List<Employee> employees);
-    }
-
-    public interface IConsumeObject {
-        void consume(Employee employee);
-    }
-
-    public interface IAdd {
-        int add(int a, int b);
-    }
-
-    private static class Employee {
-        String name;
-    }
-
 ´ÓÉÏÃæµÄÊ¾Àý´úÂë£¬ÎÒÃÇ¿ÉÒÔ×Ü½á³öÒ»Ð©½áÂÛ£º
 
 1. ËùÎ½µÄº¯Êý½Ó¿Ú¾ÍÊÇÖ¸Ö»°üº¬Ò»¸ö·ÇÄ¬ÈÏ·½·¨µÄ½Ó¿Ú£¬¿ÉÒÔÓÃ`@FunctionalInterface`×¢½â±êÃ÷Ö¸¶¨µÄ½Ó¿ÚÊÇº¯Êý½Ó¿Ú£»
 2. Èç¹ûLambdaÖÐµÄ`->`ºóÃæµÄÊÇÓï¾ä£¬²¢ÇÒµ±¸ÃÓï¾äÖ»ÓÐÒ»ÐÐµÄÊ±ºò£¬ÎÒÃÇ¿ÉÒÔ½«»¨À¨ºÅÈ¥µô£»
-3. ÏëÒª½«Lambda±í´ïÊ½¸³Öµ¸øÒ»¸ö¶ÔÏóµÄÊ±ºò£¬Èç¹ûÕâ¸ö¶ÔÏó²»ÊÇ`º¯Êý½Ó¿Ú`£¬ÄÇÃ´IDEAs»á¸øÌáÊ¾£»
+3. ÏëÒª½«Lambda±í´ïÊ½¸³Öµ¸øÒ»¸ö¶ÔÏóµÄÊ±ºò£¬Èç¹ûÕâ¸ö¶ÔÏó²»ÊÇ`º¯Êý½Ó¿Ú`£¬ÄÇÃ´IDEA»á¸øÌáÊ¾£»
 4. »¹Òª×¢Òâº¯ÊýÊ½½Ó¿ÚÊÇ²»ÔÊÐíÅ×³öÊÜ¼ìÒì³£µÄ¡£
 
 ÏÂÃæÎÒÃÇ×Ü½áÒ»Ð©³£¼ûµÄ·½·¨ÒýÓÃµÄÊ¾Àý£º
@@ -82,7 +56,7 @@ Java8µÄ¸Ä½ø±ÈÀúÊ·ÉÏÈÎºÎÒ»´Î¸Ä±ä¶¼±È½ÏÉîÔ¶¡£JavaÔÚ¸Ä½øÆäÊµÒ²ÊÇ±à³ÌÓïÑÔÉúÌ¬±ä»¯µÄÔ
 |2|`(String s) -> System.out.println(s)`|`System.out::println`|
 |3|`(str, i) -> str.substring(i)`|`String::substring`|
 
-ËùÒÔ£¬ÎÒÃÇ×Ü½áÏÂÀ´µÄÈýÖÖ·½·¨ÒýÓÃµÄÇéÐÎ
+ËùÒÔ£¬ÎÒÃÇ×Ü½áÏÂÀ´µÄÈýÖÖ·½·¨ÒýÓÃµÄÇéÐÎ£º
 
 |±àºÅ|Lambda|µÈÐ§µÄ·½·¨ÒýÓÃ|
 |:-:|:-:|:-:|
@@ -106,9 +80,13 @@ Java8µÄAPIÖÐÎªÎÒÃÇÌá¹©ÁË¼¸¸öº¯ÊýÊ½½Ó¿Ú£¬ÕâÐ©½Ó¿ÚÓÐ±ØÒªÁË½âÒ»ÏÂ¡£ÒòÎª×Ô´ÓJava8¿ªÊ
         R apply(T t);
     }
 
-ÉÏÃæ¾ÍÊÇÕâÈý¸ö½Ó¿ÚµÄ¶¨Òå¡£ÄãÖ»Òª¼ÇÏÂËüÃÇÖ»ÓÐ·µ»ØµÄÖµÊÇ²»Í¬µÄ¾Í¿ÉÒÔÁË¡£µÚÒ»¸öÓÃÀ´ÅÐ¶ÏµÄ£¬´óÖÂÓÃÀ´ÊµÏÖ¹ýÂËµÄÐ§¹û£»µÚ¶þÊÇÃ»ÓÐ·µ»ØÀàÐÍ£¬Ö»ÄÜÓÃÀ´¶Ô´«ÈëµÄ²ÎÊý½øÐÐ´¦Àí£»µÚÈý¸öÊÇÓÃÀ´Ó³ÉäµÄ£¬Ò²¾ÍÊÇËµ£¬µ±ÄãÏëÒªÊµÏÖµÄÐÐÎªµÄ²ÎÊýºÍ·µ»ØÊÇ²»Í¬µÄÀàÐÍµÄÊ±ºò¿ÉÒÔÓÃËü¡£
+ÉÏÃæ¾ÍÊÇÕâÈý¸ö½Ó¿ÚµÄ¶¨Òå¡£ËüÃÇµÄÓ¦ÓÃ³¡¾°µÄ²»Í¬¾ÍÌåÏÖÔÙ·µ»ØµÄ²ÎÊýÉÏÃæ£º
 
-ÒòÎª¶ÔÓÚÊýÖµÀàÐÍ£¬JavaÐèÒª×ö¶îÍâµÄ×°ÏäºÍ²ðÏäµÄ²Ù×÷£¬ÕâÊÇÐèÒª³É±¾µÄ¡£ËùÒÔ£¬¶ÔÓÚÉÏÃæµÄÈý¸ö½Ó¿Ú£¨ÆäËûµÄ½Ó¿ÚÒ²ÊÇ£©£¬Java8ÖÐÌá¹©ÁË²»ÐèÒª×°ÏäµÄ°æ±¾£¬Ò²¾ÍÊÇ´Ó·ºÐÍ±ä³ÉÁËÊýÖµÀàÐÍ¶øÒÑ¡£ÒÔIntPredicateÎªÀý°É£º
+1. µÚÒ»¸öÓÃÀ´ÅÐ¶ÏµÄ£¬´óÖÂÓÃÀ´ÊµÏÖ¹ýÂËµÄÐ§¹û£»
+2. µÚ¶þÊÇÃ»ÓÐ·µ»ØÀàÐÍ£¬Ö»ÄÜÓÃÀ´¶Ô´«ÈëµÄ²ÎÊý½øÐÐ´¦Àí£»
+3. µÚÈý¸öÊÇÓÃÀ´Ó³ÉäµÄ£¬Ò²¾ÍÊÇËµ£¬µ±ÄãÏëÒªÊµÏÖµÄÐÐÎªµÄ²ÎÊýºÍ·µ»ØÊÇ²»Í¬µÄÀàÐÍµÄÊ±ºò¿ÉÒÔÓÃËü£¨µ±È»£¬Èç¹ûÊÇÏàÍ¬ÀàÐÍµÄ»°Ò²ÊÇ¿ÉÒÔµÄ£©¡£
+
+ÒòÎª¶ÔÓÚÊýÖµÀàÐÍ£¬JavaÐèÒª×ö¶îÍâµÄ×°ÏäºÍ²ðÏäµÄ²Ù×÷£¬ÕâÊÇÐèÒª³É±¾µÄ¡£ËùÒÔ£¬¶ÔÓÚÉÏÃæµÄÈý¸ö½Ó¿Ú£¨ÆäËûµÄ½Ó¿ÚÒ²ÊÇ£©£¬Java8ÖÐÌá¹©ÁË²»ÐèÒª×°ÏäµÄ°æ±¾£¬Ò²¾ÍÊÇ´Ó·ºÐÍ±ä³ÉÁËÊýÖµÀàÐÍ¶øÒÑ¡£ÒÔIntPredicateÎªÀý£º
 
     public interface IntPredicate {
         boolean test(int value);
@@ -116,7 +94,7 @@ Java8µÄAPIÖÐÎªÎÒÃÇÌá¹©ÁË¼¸¸öº¯ÊýÊ½½Ó¿Ú£¬ÕâÐ©½Ó¿ÚÓÐ±ØÒªÁË½âÒ»ÏÂ¡£ÒòÎª×Ô´ÓJava8¿ªÊ
 
 ### 2.3 ¸´ºÏLambda±í´ïÊ½
 	
-Java8ÖÐÌá¹©µÄÒ»Ð©½Ó¿Ú»¹ÊÇ¿ÉÒÔ¸´ºÏ²Ù×÷µÄ¡£Ê¹ÓÃ¸´ºÏ²Ù×÷¿ÉÒÔÊµÏÖ¸ü¸´ÔÓµÄÂß¼­¡£ÕâÐ©¸´ºÏ²Ù×÷Ê±ÒÔÄ¬ÈÏ·½·¨µÄÐÎÊ½¶¨ÒåµÄ£¬Ã¿¸öº¯ÊýÊ½½Ó¿ÚÂÔÓÐ²»Í¬¡£ËùÒÔ£¬ÎÒÃÇÕâÀïÖ»ÁÐ¾Ù³ö²¿·ÖÓÃÓÚ¸´ºÏµÄ·½·¨¡£ÔÚÊµ¼ÊµÄ¿ª·¢¹ý³ÌÖÐ£¬Äã¿ÉÒÔÖ±½Ó½øÈëµ½Ö¸¶¨µÄº¯ÊýÊ½½Ó¿ÚÖÐ²é¿´ÕâÐ©·½·¨µÄ¶¨Òå¡£
+Java8ÖÐÌá¹©µÄÒ»Ð©½Ó¿Ú»¹ÊÇ¿ÉÒÔ¸´ºÏ²Ù×÷µÄ¡£Ê¹ÓÃ¸´ºÏ²Ù×÷¿ÉÒÔÊµÏÖ¸ü¸´ÔÓµÄÂß¼­¡£ÕâÐ©¸´ºÏ²Ù×÷ÊÇÒÔÄ¬ÈÏ·½·¨µÄÐÎÊ½¶¨ÒåµÄ£¬Ã¿¸öº¯ÊýÊ½½Ó¿ÚÂÔÓÐ²»Í¬¡£ËùÒÔ£¬ÎÒÃÇÕâÀïÖ»ÁÐ¾Ù³ö²¿·ÖÓÃÓÚ¸´ºÏµÄ·½·¨¡£ÔÚÊµ¼ÊµÄ¿ª·¢¹ý³ÌÖÐ£¬Äã¿ÉÒÔÖ±½Ó½øÈëµ½Ö¸¶¨µÄº¯ÊýÊ½½Ó¿ÚÖÐ²é¿´ÕâÐ©·½·¨µÄ¶¨Òå¡£
 
 #### 2.3.1 ±È½ÏÆ÷Comparator<T>
 
@@ -133,7 +111,9 @@ Java8ÖÐÌá¹©µÄÒ»Ð©½Ó¿Ú»¹ÊÇ¿ÉÒÔ¸´ºÏ²Ù×÷µÄ¡£Ê¹ÓÃ¸´ºÏ²Ù×÷¿ÉÒÔÊµÏÖ¸ü¸´ÔÓµÄÂß¼­¡£ÕâÐ©¸
 	employeePredicate.negate()
     employeePredicate.and(employee -> employee.getAge() <= 15).or(employee -> "LiHua".equals(employee.getName()))
 
-ÕâÀïÊ×ÏÈ¶¨ÒåÁËemployeePredicate£¬Ëü¿ÉÒÔÓÃÀ´¹ýÂË¡°ÄêÁä´óÓÚ13µÄ¹ÍÔ±¡±¡£¶ÔÆäµ÷ÓÃÁËnegate()·½·¨½«·µ»ØÒ»¸öPredicate£¬¿ÉÒÔÓÃÀ´¹ýÂË¡°Äê¼ÍÐ¡ÓÚµÈÓÚ13µÄ¹ÍÔ±¡±¡£È»ºó£¬×îºóµÄ¸´ºÏ²Ù×÷±íÊ¾¡°ÄêÁä´óÓÚ13²¢ÇÒÐ¡ÓÚ15µÄ¹ÍÔ±»òÕßÃû×ÖÎªLiHuaµÄ¹ÍÔ±¡±¡£×¢Òâ£¬ÕâÀïµÄandºÍor²Ù×÷µÄË³ÐòÊÇ´Ó×óÏòÓÒµÄ£¬Ò²¾ÍÊÇ`a.or(b).and(c)`±»¿´×÷`(a || b) and c`¡£
+ÕâÀïÊ×ÏÈ¶¨ÒåÁËemployeePredicate£¬Ëü¿ÉÒÔÓÃÀ´¹ýÂË¡°ÄêÁä´óÓÚ13µÄ¹ÍÔ±¡±¡£¶ÔÆäµ÷ÓÃÁËnegate()·½·¨½«·µ»ØÒ»¸öPredicate£¬¿ÉÒÔÓÃÀ´¹ýÂË¡°Äê¼ÍÐ¡ÓÚµÈÓÚ13µÄ¹ÍÔ±¡±¡£×îºóµÄ¸´ºÏ²Ù×÷Ôò±íÊ¾¡°ÄêÁä´óÓÚ13²¢ÇÒÐ¡ÓÚ15µÄ¹ÍÔ±»òÕßÃû×ÖÎªLiHuaµÄ¹ÍÔ±¡±¡£
+
+×¢Òâ£¬ÕâÀïµÄandºÍor²Ù×÷µÄË³ÐòÊÇ´Ó×óÏòÓÒµÄ£¬Ò²¾ÍÊÇ`a.or(b).and(c)`½«±»¿´×÷`(a || b) and c`¡£
 	
 #### 2.3.3 º¯ÊýFunction<T>¸´ºÏ
 	
@@ -146,6 +126,8 @@ FunctionÓÐandThenºÍcomposeÁ½¸öÄ¬ÈÏ·½·¨£¬ËüÃÇ¶¼»á·µ»ØÒ»¸öFunctionÊµÀý¡£
     System.out.println(h1.apply(1));
     System.out.println(h2.apply(1));
 
-ÉÏÃæÊÇFunctionµÄ¸´ºÏ²Ù×÷µÄÊ¾Àý£¬ÆäÊµËüµÄÐ§¹û¾ÍÏàµ±ÓÚÊýÑ§ÖÐµÄ¸´ºÏº¯Êý¡£²»¹ý£¬Ó¦µ±×¢ÒâÒ»ÏÂÁ½¸ö·½·¨µÄÊµ¼ÊµÄ¸´ºÏÐ§¹û¡£
+ÉÏÃæÊÇFunctionµÄ¸´ºÏ²Ù×÷µÄÊ¾Àý£¬ÆäÊµËüµÄÐ§¹û¾ÍÏàµ±ÓÚÊýÑ§ÖÐµÄ¸´ºÏº¯Êý¡£²»¹ý£¬Ó¦µ±×¢ÒâÒ»ÏÂÁ½¸ö·½·¨µÄÊµ¼ÊµÄ¸´ºÏÐ§¹ûÊÇ²»Í¬µÄ¡£
 	
-	
+## ×Ü½á
+
+ÒÔÉÏ¾ÍÊÇJava8¸Ä½øµÄµÚÒ»²¿·Ö£¬×Ü½áÒ»ÏÂ£ºÐÐÎª²ÎÊý»¯ÆäÊµ¾ÍÊÇ²ßÂÔÄ£Ê½£¬Ê¹ÓÃLambda¿ÉÒÔ¼ò»¯º¯Êý½Ó¿ÚµÄÐÎÊ½£»Java APIÖÐÌá¹©ÁËÒ»Ð©ÓÐÓÃµÄº¯ÊýÊ½½Ó¿Ú£¬ÕâÐ©½Ó¿ÚÓÖ¿ÉÒÔÊ¹ÓÃ¸´ºÏ·½·¨ÊµÏÖ¸ü¼ÓÇ¿´óµÄ¹¦ÄÜ¡£
