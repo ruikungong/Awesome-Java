@@ -196,6 +196,12 @@
 |3|<a id="logging" href="ThirdPart/Logging.md">日志框架</a>|
 |4|<a id="apache_io" href="ThirdPart/ApacheIO.md">Apache IO</a>|
 
+<h2 id="java_8">9、Java 8</h2>
+
+|编号|名称|
+|:-:|:-:|
+|1|[Quick Java8 (一)](Java8/QuickJava8_1.md)|
+
 <h2 id="container">10、容器</h2>
 
 <h3 id="tomcat">Tomcat</h3>
