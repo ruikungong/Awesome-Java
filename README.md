@@ -200,7 +200,8 @@
 
 |编号|名称|
 |:-:|:-:|
-|1|[Quick Java8 (一)](Java8/QuickJava8_1.md)|
+|1|[五分钟学习Java8的行为参数化](Java8/QuickJava8_1.md)|
+|2|[五分钟学习Java8的流编程](Java8/QuickJava8_2.md)|
 
 <h2 id="container">10、容器</h2>
 
