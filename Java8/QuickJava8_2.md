@@ -10,7 +10,7 @@
 
 ## 2¡¢É¸Ñ¡
 
-### 2.1 °´Ìõ¼ş¹ıÂË
+### 2.1 ¹ıÂË
 
     Stream<T> filter(Predicate<? super T> predicate);
 
@@ -30,7 +30,7 @@ filterÍ¨¹ıÖ¸¶¨Ò»¸öPredicateÀàĞÍµÄĞĞÎª²ÎÊı¶ÔÁ÷ÖĞµÄÔªËØ½øĞĞ¹ıÂË£¬×îÖÕ»¹ÊÇ»á·µ»ØÒ»¸
     List<Integer> filter = list.stream().filter(integer -> integer > 3).distinct().collect(Collectors.toList());
 	// [4, 5, 6, 7, 8, 9]
 	
-### 2.3 ÏŞÖÆ·µ»Ø½á¹û
+### 2.3 ÏŞÖÆ
 
     Stream<T> limit(long maxSize);
 
@@ -40,7 +40,7 @@ filterÍ¨¹ıÖ¸¶¨Ò»¸öPredicateÀàĞÍµÄĞĞÎª²ÎÊı¶ÔÁ÷ÖĞµÄÔªËØ½øĞĞ¹ıÂË£¬×îÖÕ»¹ÊÇ»á·µ»ØÒ»¸
     List<Integer> filter = list.stream().filter(integer -> integer > 3).limit(3).collect(Collectors.toList());
     // [4, 5, 5]
 	
-### 2.4 Ìø¹ıÔªËØ
+### 2.4 Ìø¹ı
 
     Stream<T> skip(long n);
 
@@ -59,6 +59,51 @@ filterÍ¨¹ıÖ¸¶¨Ò»¸öPredicateÀàĞÍµÄĞĞÎª²ÎÊı¶ÔÁ÷ÖĞµÄÔªËØ½øĞĞ¹ıÂË£¬×îÖÕ»¹ÊÇ»á·µ»ØÒ»¸
     List<Integer> list = Arrays.asList(1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9);
     List<String> filter = list.stream().map((integer -> String.valueOf(integer) + "-")).collect(Collectors.toList());
     // ½á¹û£º[1-, 1-, 2-, 3-, 4-, 5-, 5-, 6-, 7-, 8-, 9-]
+
+## 4¡¢²éÕÒ
+
+    Optional<T> findFirst();
+    Optional<T> findAny();
+
+ÔÚÖ¸¶¨µÄÁ÷ÖĞ²éÕÒÔªËØµÄÊ±ºò¿ÉÒÔÓÃÕâÁ½¸ö·½·¨£¬ËüÃÇÊÇStream½Ó¿ÚÖĞµÄ·½·¨£¬·µ»ØµÄÒÑ¾­²»ÔÙÊÇStreamÀàĞÍÁË£¬Õâ¿ÉÒÔËµÃ÷ËüÃÇÊÇÖÕ¶Ë²Ù×÷¡£ËùÒÔ£¬Í¨³£Ò²ÊÇÓÃÀ´·ÅÔÚÖÕ¶Ë£¬¼ÌĞø²Ù×÷µÄ»°¾ÍÒªÊ¹ÓÃOptional½Ó¿ÚµÄ·½·¨ÁË¡£
+
+    List<Integer> list = Arrays.asList(1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9);
+    Optional<Integer> optionalInteger = list.stream().filter(integer -> integer > 10).findAny();
+    Optional<Integer> optionalInteger = list.stream().filter(integer -> integer > 10).findFirst();
+
+ÉÏÃæÊÇÊ¹ÓÃµÄÁ½¸öÊ¾Àı£¬ÕâÀï·µ»ØµÄ½á¹ûÊÇOptionalÀàĞÍµÄ¡£OptionalµÄÉè¼Æ½è¼øÁËGuavaÖĞµÄOptional¡£Ê¹ÓÃËüµÄºÃ´¦ÊÇÄã²»ĞèÒªÏñÒÔÇ°Ò»Ñù½«·µ»ØµÄ½á¹ûÓënull½øĞĞÅĞ¶Ï£¬²¢ÔÚ½á¹ûÎªnullµÄÊ±ºòÍ¨¹ı`=`¸³ÖµÒ»¸öÄ¬ÈÏÖµÁË¡£Ê¹ÓÃOptionalÖĞµÄ·½·¨£¬Äã¿ÉÒÔ¸üÓÅÑÅµØÍê³ÉÏàÍ¬µÄ²Ù×÷¡£ÏÂÃæÎÒÃÇÁĞ³öOptionalÖĞµÄÒ»Ğ©³£ÓÃµÄ·½·¨£º
+
+|±àºÅ|·½·¨|ËµÃ÷|
+|:-:|:-:|:-:|
+|1|isPresent()|ÅĞ¶ÏÖµÊÇ·ñ´æÔÚ£¬´æÔÚµÄ»°¾Í·µ»Øtrue£¬·ñÔò·µ»Øfalse|
+|2|isPresent(Consumer<T> block)|ÔÚÖµ´æÔÚµÄÊ±ºòÖ´ĞĞ¸ø¶¨µÄ´úÂë|
+|3|T get()|Èç¹ûÖµ´æÔÚ£¬ÄÇÃ´·µ»Ø¸ÃÖµ£»·ñÔò£¬Å×³öNoSuchElementÒì³£|
+|4|T orElse(T other)|Èç¹ûÖµ´æÔÚ£¬ÄÇÃ´·µ»Ø¸ÃÖµ£»·ñÔò£¬Ôò·µ»Øother|
+	
+## 5¡¢Æ¥Åä
+
+    boolean allMatch(Predicate<? super T> predicate);
+    boolean noneMatch(Predicate<? super T> predicate);
+    boolean anyMatch(Predicate<? super T> predicate);
+	
+´Ó¶¨ÒåÉÏÃæÀ´¿´£¬ÉÏÃæµÄÈı¸ö·½·¨Ò²ÊÇÖÕ¶Ë²Ù×÷¡£ËüÃÇ·Ö±ğÓÃÀ´ÅĞ¶Ï£ºÁ÷ÖĞµÄÊı¾İÊÇ·ñÈ«²¿Æ¥ÅäÖ¸¶¨µÄÌõ¼ş£¬Á÷ÖĞµÄÊı¾İÊÇ·ñÈ«²¿²»Æ¥ÅäÖ¸¶¨µÄÌõ¼ş£¬Á÷ÖĞµÄÊı¾İÊÇ·ñ´æÔÚÒ»Ğ©Æ¥ÅäÖ¸¶¨µÄÌõ¼ş¡£ÏÂÃæÊÇÒ»Ğ©Ê¾Àı£º
+	
+    List<Integer> list = Arrays.asList(1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9);
+    boolean allMatch = list.stream().allMatch(integer -> integer < 10);
+    boolean anyMatch = list.stream().anyMatch(integer -> integer > 3);
+    boolean noneMatch = list.stream().noneMatch(integer -> integer > 100);
+
+## 6¡¢¹éÔ¼
+
+    Optional<T> reduce(BinaryOperator<T> accumulator);
+    T reduce(T identity, BinaryOperator<T> accumulator);
+
+Stream½Ó¿ÚÖĞµÄreduce·½·¨¹²ÓĞÈı¸öÖØÔØ°æ±¾£¬ÉÏÃæÎÒÃÇ¸ø³ö³£ÓÃµÄÁ½¸öµÄ¶¨Òå¡£ËüÃÇ»ù±¾ÊÇÀàËÆµÄ£¬Ö»ÊÇµÚ¶ş¸ö·½·¨²ÎÊıÁĞ±íÖĞ¶àÁË¸ö³õÊ¼Öµ£¬¶øÃ»ÓĞ³õÊ¼ÖµµÄÄÇ¸ö£¬·µ»ØÁËOptinoalÀàĞÍ£»ËùÒÔ£¬Çø±ğ²»´ó£¬ÎÒÃÇÖ»Òª¸ãÃ÷°×ËüµÄĞĞÎª¾Í¿ÉÒÔÁË¡£ÏÂÃæÊÇ¹éÔ¼µÄÀı×Ó£º
+
+    List<String> list = Arrays.asList("a", "b", "c", "d", "e", "f");
+    String ret = list.stream().reduce("-", (a, b) -> a + b);
+
+ËüµÄÊä³ö½á¹ûÊÇ`-abcdef`£¬ÏÔÈ»ËüµÄĞ§¹û¾ÍÊÇ£º¼ÙÈç£¬`$`ÊÇÄ³ÖÖ²Ù×÷£¬ListÊÇÄ³¸ö"ÊıÁĞ"£¬ÄÇÃ´¹éÔ¼µÄÒâÒå¾ÍÊÇ`³õÊ¼Öµ$n[0]$n[1]$n[2]$...$n[n-1]`¡£
 
 
 
