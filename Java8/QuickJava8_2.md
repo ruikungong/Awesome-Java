@@ -105,6 +105,63 @@ Stream接口中的reduce方法共有三个重载版本，上面我们给出常用的两个的定义。它们基本
 
 它的输出结果是`-abcdef`，显然它的效果就是：假如，`$`是某种操作，List是某个"数列"，那么归约的意义就是`初始值$n[0]$n[1]$n[2]$...$n[n-1]`。
 
+## 7、数值流
+
+同样是因为装箱的性能原因，Java8中为数值类型专门提供了数值流：IntStream DoubleStream和LongStream。Stream接口提供了三个中间方法来完成从任意流映射到数值流的操作：
+
+    IntStream mapToInt(ToIntFunction<? super T> mapper);
+    LongStream mapToLong(ToLongFunction<? super T> mapper);
+    DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper);
+	
+所以你可以用上面三个方法从任意流中获取数值流。然后，再利用数值流的方法来完成其他的操作。上面三个数值流和Stream接口都继承子BaseStream，所以它们包含的方法还是有区别的，但总体上来说大同小异。Stream比较具有一般性，上面三个数值流更有针对性，后者也提供了许多便利的方法。如果想要从数值流中获取对象流，你可以调用它们的`boxed()`方法，来获取装箱之后的流。
+
+这里稍提及一下，对于Optional，Java8也为我们提供了对应的数值类型：OptionalInt OptionalDouble OptionalLong。
+
+在上面的三种数值流中还有几个静态方法用于获取指定数值范围的流：
+
+    public static LongStream range(long startInclusive, final long endExclusive)
+    public static LongStream rangeClosed(long startInclusive, final long endInclusive)
+
+上面是用于获取指定范围的LongStream的方法，一个对应于数学中的开区间，一个对应于数学中的闭区间的概念。
+	
+## 8、构建流
+
+上面我们在获取流的时候，实际上都是从Collection的默认方法`stream()`中获取的流，这有些笨拙。实际上，Java8为我们提供了一些创建流的方法。这里，我们列举一下这些方法：
+
+    public static<T> Builder<T> builder() // 1
+    public static<T> Stream<T> empty() // 2
+    public static<T> Stream<T> of(T t) // 3
+    public static<T> Stream<T> of(T... values) // 4
+    public static<T> Stream<T> iterate(final T seed, final UnaryOperator<T> f) // 5
+    public static<T> Stream<T> generate(Supplier<T> s) // 6 
+    public static <T> Stream<T> concat(Stream<? extends T> a, Stream<? extends T> b) // 7
+
+上面的方法都是Stream接口中的静态方法，我们可以用这些方法来获取到流。下面我们对每个方法做一些简要的说明：
+
+1. 从名称上就可以看出这里使用了构建者模式，你可以每次调用Builder的`add()`方法插入一个元素来创建流；
+2. 用来创建一个空的流
+3. 创建一个只包含一个元素的流
+4. 使用不定参数创建一个包含指定元素的流
+5. 弄清楚它的原理关键是要搞明白后面的UnaryOperator的含义，这是一个函数式接口，并且继承自Function，不同之处在于它的入参和回参类型相同。说明，这个方法的原理是从某个种子树开始，按照后面的函数的规则进行计算，每次是在之前的数的基础上执行某个函数的。所以`Stream.iterate(2, n -> n * n).limit(3)`将返回由`2 4 16`构成的流。
+6. 这里的Supplier也是一个函数接口，它只有一个get()方法，无参，只接受指定类型的返回值。所以，这个方法需要你提供一个用于生成数值的函数（或者说规则），比如Math.random()等等。
+7. 这个比较容易理解，就是通过将两个流合并来得到一个新的流。
+	
+## 9、收集器
+
+上面我们已经见识过了流的规约操作，但是那些操作还比较幼稚。Java8的收集器为我们提供了更加强大的规约功能。
+
+说起收集器，肯定绕不过两个类Collector和Collectors，它俩有啥关系呢？其实Collector只是一个接口；Collectors是一个类, 其中的静态内部类CollectorImpl实现了该接口，并且被Collectors用来提供一些预定的功能。Collectors中有许多的静态方法用于获取Collector的实例，使用这些实例我们可以完成复杂的功能。当然，我们也可以通过实现Collector接口来定义自己的收集器。
+
+Stream的collect()方法有3个重载的版本。我们就是通过其中的一个来使用收集器的，这是它的定义：
+
+    <R, A> R collect(Collector<? super T, A, R> collector);
+	
+我们注意一下这个方法的参数和返回类型. 从上面我们可以看出传入的Collector有3个泛型,其中的最后一个泛类型R与返回的类型是一致的. 这很重要,可以预防你用某方法却不知道最终返回的是什么类型;-) 
 
 
 
+
+	
+	
+
+	
