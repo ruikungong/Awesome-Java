@@ -156,12 +156,84 @@ Stream的collect()方法有3个重载的版本。我们就是通过其中的一个来使用收集器的，这是
 
     <R, A> R collect(Collector<? super T, A, R> collector);
 	
-我们注意一下这个方法的参数和返回类型. 从上面我们可以看出传入的Collector有3个泛型,其中的最后一个泛类型R与返回的类型是一致的. 这很重要,可以预防你用某方法却不知道最终返回的是什么类型;-) 
+我们注意一下这个方法的参数和返回类型. 从上面我们可以看出传入的Collector有3个泛型,其中的最后一个泛类型R与返回的类型是一致的. 这很重要——可以预防你调用了某个方法却不知道最终返回的是什么类型;-) 
 
+我们先来看一些简单的例子，这里的stream是由Student对象构成的流：
 
+    Optional<Student> student = stream.collect(Collectors.maxBy(comparator))  // 需要传入一个比较器到maxBy()方法中
+    long count = stream.collect(Collectors.counting())
 
-
+上面的两种方式比较鸡肋，因为你可以使用count()和max()方法来替代它们。下面我们再看一些收集器的其他例子，注意在这些例子中，我并没有使用lambda简化函数式接口，是因为想要你更清楚地看到它的泛类型和函数名称。
 	
-	
+### 9.1 计算平均值和总数
 
+下面的语句用于计算平均值，类似的还有summingInt()用于计算总数。它们的用法是相似的。
+	
+    Double d = stream.collect(Collectors.averagingInt(new ToIntFunction<Student>() {
+        @Override
+        public int applyAsInt(Student value) {
+            return value.getGrade();
+        }
+   }));
+ 
+从上面我们看出，调用averagingInt()方法的时候需要传入一个ToIntFunction函数式接口，用于根据指定的类型返回一个整数值。
+
+### 9.2 连接字符串
+
+joining()工厂方法是专门用来连接字符串的，它要求流是字符串流，所以在对Student流进行拼接之前，需要先将其映射成字符串流：
+
+    String members = stream.map(new Function<Student, String>() {
+        @Override
+        public String apply(Student student) {
+           return student.getName();
+        }
+    }).collect(Collectors.joining(", ")); // 使用','将字符串拼接起来
+	
+### 9.3 广义的规约汇总
+
+    Optional<Student> optional = stream.collect(Collectors.reducing(new BinaryOperator<Student>() {
+        @Override
+        public Student apply(Student student, Student student2) {
+            return student.getGrade() > student2.getGrade() ? student : student2;
+        }
+    }));
+
+上面的就是用来规约的函数。我们用了reducing工厂方法，并向其中传入一个BinaryOperator类型。这里我们指定最终的返回类型是Student。所以，上面的代码的效果是获取成绩最大的学生。
+
+### 9.4 分组
+
+Collectors中的分组还是比较有意思的。我们先看groupingBy方法的定义：
+
+    groupingBy(Function<? super T, ? extends K> classifier)
+    Collector<T, ?, Map<K, D>> groupingBy(Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream)
+
+groupingBy方法有3个重载的版本，这里我们给出其中常用的两个。第一个方法是通过指定规则对流进行分组的，而第二个方法先通过classifier指定的规则对流进行分组，然后用downstream的规则对分组的流进行后续的操作。注意第二个参数仍然是Collector类型，所以可以对分组后的流再次收集，比如再分组、求最大值等等。
+
+    Map<Integer, List<Student>> map = stream.collect(Collectors.groupingBy(new Function<Student, Integer>() {
+        @Override
+        public Integer apply(Student student) {
+           return student.getClazz();
+        }
+    }));
+	
+以上是groupingBy()方法的第一个例子。注意这里我们是通过将Student通过'班级字段'映射成一个整数来进行分组的。下面是一个二次分组的例子：
+
+    Map<Integer, Map<Integer, List<Student>>> map = stream.collect(Collectors.groupingBy(new Function<Student, Integer>() {
+        @Override
+        public Integer apply(Student student) {
+           return student.getClazz();
+        }
+    }, Collectors.groupingBy(new Function<Student, Integer>() {
+        @Override
+        public Integer apply(Student student) {
+            return student.getGrade() == 100 ? 1 : student.getGrade() > 90 ? 2 : student.getGrade() > 80 ? 3 : 4;
+        }
+    })));
+	
+### 9.5 分区
+
+
+
+
+ 
 	
