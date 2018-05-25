@@ -142,7 +142,7 @@ Stream½Ó¿ÚÖÐµÄreduce·½·¨¹²ÓÐÈý¸öÖØÔØ°æ±¾£¬ÉÏÃæÎÒÃÇ¸ø³ö³£ÓÃµÄÁ½¸öµÄ¶¨Òå¡£ËüÃÇ»ù±¾
 2. ÓÃÀ´´´½¨Ò»¸ö¿ÕµÄÁ÷
 3. ´´½¨Ò»¸öÖ»°üº¬Ò»¸öÔªËØµÄÁ÷
 4. Ê¹ÓÃ²»¶¨²ÎÊý´´½¨Ò»¸ö°üº¬Ö¸¶¨ÔªËØµÄÁ÷
-5. ÅªÇå³þËüµÄÔ­Àí¹Ø¼üÊÇÒª¸ãÃ÷°×ºóÃæµÄUnaryOperatorµÄº¬Òå£¬ÕâÊÇÒ»¸öº¯ÊýÊ½½Ó¿Ú£¬²¢ÇÒ¼Ì³Ð×ÔFunction£¬²»Í¬Ö®´¦ÔÚÓÚËüµÄÈë²ÎºÍ»Ø²ÎÀàÐÍÏàÍ¬¡£ËµÃ÷£¬Õâ¸ö·½·¨µÄÔ­ÀíÊÇ´ÓÄ³¸öÖÖ×ÓÊ÷¿ªÊ¼£¬°´ÕÕºóÃæµÄº¯ÊýµÄ¹æÔò½øÐÐ¼ÆËã£¬Ã¿´ÎÊÇÔÚÖ®Ç°µÄÊýµÄ»ù´¡ÉÏÖ´ÐÐÄ³¸öº¯ÊýµÄ¡£ËùÒÔ`Stream.iterate(2, n -> n * n).limit(3)`½«·µ»ØÓÉ`2 4 16`¹¹³ÉµÄÁ÷¡£
+5. ÅªÇå³þËüµÄÔ­Àí¹Ø¼üÊÇÒª¸ãÃ÷°×ºóÃæµÄUnaryOperatorµÄº¬Òå£¬ÕâÊÇÒ»¸öº¯ÊýÊ½½Ó¿Ú£¬²¢ÇÒ¼Ì³Ð×ÔFunction£¬²»Í¬Ö®´¦ÔÚÓÚËüµÄÈë²ÎºÍ»Ø²ÎÀàÐÍÏàÍ¬¡£Õâ¸ö·½·¨µÄÔ­ÀíÊÇ´ÓÄ³¸öÖÖ×ÓÖµ¿ªÊ¼£¬°´ÕÕºóÃæµÄº¯ÊýµÄ¹æÔò½øÐÐ¼ÆËã£¬Ã¿´ÎÊÇÔÚÖ®Ç°µÄÖµµÄ»ù´¡ÉÏÖ´ÐÐÄ³¸öº¯ÊýµÄ¡£ËùÒÔ`Stream.iterate(2, n -> n * n).limit(3)`½«·µ»ØÓÉ`2 4 16`¹¹³ÉµÄÁ÷¡£
 6. ÕâÀïµÄSupplierÒ²ÊÇÒ»¸öº¯Êý½Ó¿Ú£¬ËüÖ»ÓÐÒ»¸öget()·½·¨£¬ÎÞ²Î£¬Ö»½ÓÊÜÖ¸¶¨ÀàÐÍµÄ·µ»ØÖµ¡£ËùÒÔ£¬Õâ¸ö·½·¨ÐèÒªÄãÌá¹©Ò»¸öÓÃÓÚÉú³ÉÊýÖµµÄº¯Êý£¨»òÕßËµ¹æÔò£©£¬±ÈÈçMath.random()µÈµÈ¡£
 7. Õâ¸ö±È½ÏÈÝÒ×Àí½â£¬¾ÍÊÇÍ¨¹ý½«Á½¸öÁ÷ºÏ²¢À´µÃµ½Ò»¸öÐÂµÄÁ÷¡£
 	
@@ -150,20 +150,20 @@ Stream½Ó¿ÚÖÐµÄreduce·½·¨¹²ÓÐÈý¸öÖØÔØ°æ±¾£¬ÉÏÃæÎÒÃÇ¸ø³ö³£ÓÃµÄÁ½¸öµÄ¶¨Òå¡£ËüÃÇ»ù±¾
 
 ÉÏÃæÎÒÃÇÒÑ¾­¼ûÊ¶¹ýÁËÁ÷µÄ¹æÔ¼²Ù×÷£¬µ«ÊÇÄÇÐ©²Ù×÷»¹±È½ÏÓ×ÖÉ¡£Java8µÄÊÕ¼¯Æ÷ÎªÎÒÃÇÌá¹©ÁË¸ü¼ÓÇ¿´óµÄ¹æÔ¼¹¦ÄÜ¡£
 
-ËµÆðÊÕ¼¯Æ÷£¬¿Ï¶¨ÈÆ²»¹ýÁ½¸öÀàCollectorºÍCollectors£¬ËüÁ©ÓÐÉ¶¹ØÏµÄØ£¿ÆäÊµCollectorÖ»ÊÇÒ»¸ö½Ó¿Ú£»CollectorsÊÇÒ»¸öÀà, ÆäÖÐµÄ¾²Ì¬ÄÚ²¿ÀàCollectorImplÊµÏÖÁË¸Ã½Ó¿Ú£¬²¢ÇÒ±»CollectorsÓÃÀ´Ìá¹©Ò»Ð©Ô¤¶¨µÄ¹¦ÄÜ¡£CollectorsÖÐÓÐÐí¶àµÄ¾²Ì¬·½·¨ÓÃÓÚ»ñÈ¡CollectorµÄÊµÀý£¬Ê¹ÓÃÕâÐ©ÊµÀýÎÒÃÇ¿ÉÒÔÍê³É¸´ÔÓµÄ¹¦ÄÜ¡£µ±È»£¬ÎÒÃÇÒ²¿ÉÒÔÍ¨¹ýÊµÏÖCollector½Ó¿ÚÀ´¶¨Òå×Ô¼ºµÄÊÕ¼¯Æ÷¡£
+ËµÆðÊÕ¼¯Æ÷£¬¿Ï¶¨ÈÆ²»¹ýÁ½¸öÀàCollectorºÍCollectors£¬ËüÁ©ÓÐÉ¶¹ØÏµÄØ£¿ÆäÊµCollectorÖ»ÊÇÒ»¸ö½Ó¿Ú£»CollectorsÊÇÒ»¸öÀà, ÆäÖÐµÄ¾²Ì¬ÄÚ²¿ÀàCollectorImplÊµÏÖÁË¸Ã½Ó¿Ú£¬²¢ÇÒ±»CollectorsÓÃÀ´Ìá¹©Ò»Ð©¹¦ÄÜ¡£CollectorsÖÐÓÐÐí¶àµÄ¾²Ì¬·½·¨ÓÃÓÚ»ñÈ¡CollectorµÄÊµÀý£¬Ê¹ÓÃÕâÐ©ÊµÀýÎÒÃÇ¿ÉÒÔÍê³É¸´ÔÓµÄ¹¦ÄÜ¡£µ±È»£¬ÎÒÃÇÒ²¿ÉÒÔÍ¨¹ýÊµÏÖCollector½Ó¿ÚÀ´¶¨Òå×Ô¼ºµÄÊÕ¼¯Æ÷¡£
 
 StreamµÄcollect()·½·¨ÓÐ3¸öÖØÔØµÄ°æ±¾¡£ÎÒÃÇ¾ÍÊÇÍ¨¹ýÆäÖÐµÄÒ»¸öÀ´Ê¹ÓÃÊÕ¼¯Æ÷µÄ£¬ÕâÊÇËüµÄ¶¨Òå£º
 
     <R, A> R collect(Collector<? super T, A, R> collector);
 	
-ÎÒÃÇ×¢ÒâÒ»ÏÂÕâ¸ö·½·¨µÄ²ÎÊýºÍ·µ»ØÀàÐÍ. ´ÓÉÏÃæÎÒÃÇ¿ÉÒÔ¿´³ö´«ÈëµÄCollectorÓÐ3¸ö·ºÐÍ,ÆäÖÐµÄ×îºóÒ»¸ö·ºÀàÐÍRÓë·µ»ØµÄÀàÐÍÊÇÒ»ÖÂµÄ. ÕâºÜÖØÒª¡ª¡ª¿ÉÒÔÔ¤·ÀÄãµ÷ÓÃÁËÄ³¸ö·½·¨È´²»ÖªµÀ×îÖÕ·µ»ØµÄÊÇÊ²Ã´ÀàÐÍ;-) 
+ÎÒÃÇ×¢ÒâÒ»ÏÂÕâ¸ö·½·¨µÄ²ÎÊýºÍ·µ»ØÀàÐÍ. ´ÓÉÏÃæÎÒÃÇ¿ÉÒÔ¿´³ö´«ÈëµÄCollectorÓÐ3¸ö·ºÐÍ,ÆäÖÐµÄ×îºóÒ»¸ö·ºÀàÐÍRÓë·µ»ØµÄÀàÐÍÊÇÒ»ÖÂµÄ. ÕâºÜÖØÒª¡ª¡ª¿ÉÒÔÔ¤·ÀÄãµ÷ÓÃÁËÄ³¸ö·½·¨È´²»ÖªµÀ×îÖÕ·µ»ØµÄÊÇÊ²Ã´ÀàÐÍ¡£
 
 ÎÒÃÇÏÈÀ´¿´Ò»Ð©¼òµ¥µÄÀý×Ó£¬ÕâÀïµÄstreamÊÇÓÉStudent¶ÔÏó¹¹³ÉµÄÁ÷£º
 
     Optional<Student> student = stream.collect(Collectors.maxBy(comparator))  // ÐèÒª´«ÈëÒ»¸ö±È½ÏÆ÷µ½maxBy()·½·¨ÖÐ
     long count = stream.collect(Collectors.counting())
 
-ÉÏÃæµÄÁ½ÖÖ·½Ê½±È½Ï¼¦Àß£¬ÒòÎªÄã¿ÉÒÔÊ¹ÓÃcount()ºÍmax()·½·¨À´Ìæ´úËüÃÇ¡£ÏÂÃæÎÒÃÇÔÙ¿´Ò»Ð©ÊÕ¼¯Æ÷µÄÆäËûÀý×Ó£¬×¢ÒâÔÚÕâÐ©Àý×ÓÖÐ£¬ÎÒ²¢Ã»ÓÐÊ¹ÓÃlambda¼ò»¯º¯ÊýÊ½½Ó¿Ú£¬ÊÇÒòÎªÏëÒªÄã¸üÇå³þµØ¿´µ½ËüµÄ·ºÀàÐÍºÍº¯ÊýÃû³Æ¡£
+ÉÏÃæµÄÁ½ÖÖ·½Ê½±È½Ï¼¦Àß£¬ÒòÎªÄã¿ÉÒÔÊ¹ÓÃcount()ºÍmax()·½·¨À´Ìæ´úËüÃÇ¡£ÏÂÃæÎÒÃÇÔÙ¿´Ò»Ð©ÊÕ¼¯Æ÷µÄÆäËûÀý×Ó£¬×¢ÒâÔÚÕâÐ©Àý×ÓÖÐ£¬ÎÒ²¢Ã»ÓÐÊ¹ÓÃlambda¼ò»¯º¯ÊýÊ½½Ó¿Ú£¬ÊÇÒòÎªÏëÒªÄã¸üÇå³þµØ¿´µ½ËüµÄ·ºÀàÐÍºÍ·½·¨¶¨Òå¡£Õâ¿ÉÄÜÓÐÖúÓÚÄãÀí½âÕâÐ©·½·¨µÄ×÷ÓÃ»úÀí¡£
 	
 ### 9.1 ¼ÆËãÆ½¾ùÖµºÍ×ÜÊý
 
@@ -174,7 +174,7 @@ StreamµÄcollect()·½·¨ÓÐ3¸öÖØÔØµÄ°æ±¾¡£ÎÒÃÇ¾ÍÊÇÍ¨¹ýÆäÖÐµÄÒ»¸öÀ´Ê¹ÓÃÊÕ¼¯Æ÷µÄ£¬ÕâÊÇ
         public int applyAsInt(Student value) {
             return value.getGrade();
         }
-   }));
+    }));
  
 ´ÓÉÏÃæÎÒÃÇ¿´³ö£¬µ÷ÓÃaveragingInt()·½·¨µÄÊ±ºòÐèÒª´«ÈëÒ»¸öToIntFunctionº¯ÊýÊ½½Ó¿Ú£¬ÓÃÓÚ¸ù¾ÝÖ¸¶¨µÄÀàÐÍ·µ»ØÒ»¸öÕûÊýÖµ¡£
 
@@ -204,10 +204,10 @@ joining()¹¤³§·½·¨ÊÇ×¨ÃÅÓÃÀ´Á¬½Ó×Ö·û´®µÄ£¬ËüÒªÇóÁ÷ÊÇ×Ö·û´®Á÷£¬ËùÒÔÔÚ¶ÔStudentÁ÷½ø
 
 CollectorsÖÐµÄ·Ö×é»¹ÊÇ±È½ÏÓÐÒâË¼µÄ¡£ÎÒÃÇÏÈ¿´groupingBy·½·¨µÄ¶¨Òå£º
 
-    groupingBy(Function<? super T, ? extends K> classifier)
+    Collector<T, ?, Map<K, D>> groupingBy(Function<? super T, ? extends K> classifier)
     Collector<T, ?, Map<K, D>> groupingBy(Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream)
 
-groupingBy·½·¨ÓÐ3¸öÖØÔØµÄ°æ±¾£¬ÕâÀïÎÒÃÇ¸ø³öÆäÖÐ³£ÓÃµÄÁ½¸ö¡£µÚÒ»¸ö·½·¨ÊÇÍ¨¹ýÖ¸¶¨¹æÔò¶ÔÁ÷½øÐÐ·Ö×éµÄ£¬¶øµÚ¶þ¸ö·½·¨ÏÈÍ¨¹ýclassifierÖ¸¶¨µÄ¹æÔò¶ÔÁ÷½øÐÐ·Ö×é£¬È»ºóÓÃdownstreamµÄ¹æÔò¶Ô·Ö×éµÄÁ÷½øÐÐºóÐøµÄ²Ù×÷¡£×¢ÒâµÚ¶þ¸ö²ÎÊýÈÔÈ»ÊÇCollectorÀàÐÍ£¬ËùÒÔ¿ÉÒÔ¶Ô·Ö×éºóµÄÁ÷ÔÙ´ÎÊÕ¼¯£¬±ÈÈçÔÙ·Ö×é¡¢Çó×î´óÖµµÈµÈ¡£
+groupingBy·½·¨ÓÐ3¸öÖØÔØµÄ°æ±¾£¬ÕâÀïÎÒÃÇ¸ø³öÆäÖÐ³£ÓÃµÄÁ½¸ö¡£µÚÒ»¸ö·½·¨ÊÇÍ¨¹ýÖ¸¶¨¹æÔò¶ÔÁ÷½øÐÐ·Ö×éµÄ£¬¶øµÚ¶þ¸ö·½·¨ÏÈÍ¨¹ýclassifierÖ¸¶¨µÄ¹æÔò¶ÔÁ÷½øÐÐ·Ö×é£¬È»ºóÓÃdownstreamµÄ¹æÔò¶Ô·Ö×éºóµÄÁ÷½øÐÐºóÐøµÄ²Ù×÷¡£×¢ÒâµÚ¶þ¸ö²ÎÊýÈÔÈ»ÊÇCollectorÀàÐÍ£¬ÕâËµÃ÷ÎÒÃÇÈÔÈ»¿ÉÒÔ¶Ô·Ö×éºóµÄÁ÷ÔÙ´ÎÊÕ¼¯£¬±ÈÈçÔÙ·Ö×é¡¢Çó×î´óÖµµÈµÈ¡£
 
     Map<Integer, List<Student>> map = stream.collect(Collectors.groupingBy(new Function<Student, Integer>() {
         @Override
@@ -216,7 +216,7 @@ groupingBy·½·¨ÓÐ3¸öÖØÔØµÄ°æ±¾£¬ÕâÀïÎÒÃÇ¸ø³öÆäÖÐ³£ÓÃµÄÁ½¸ö¡£µÚÒ»¸ö·½·¨ÊÇÍ¨¹ýÖ¸¶¨¹
         }
     }));
 	
-ÒÔÉÏÊÇgroupingBy()·½·¨µÄµÚÒ»¸öÀý×Ó¡£×¢ÒâÕâÀïÎÒÃÇÊÇÍ¨¹ý½«StudentÍ¨¹ý'°à¼¶×Ö¶Î'Ó³Éä³ÉÒ»¸öÕûÊýÀ´½øÐÐ·Ö×éµÄ¡£ÏÂÃæÊÇÒ»¸ö¶þ´Î·Ö×éµÄÀý×Ó£º
+ÒÔÉÏÊÇgroupingBy()·½·¨µÄµÚÒ»¸öÀý×Ó¡£×¢ÒâÕâÀïÎÒÃÇÊÇÍ¨¹ý½«StudentÍ¨¹ý'°à¼¶×Ö¶Î'Ó³Éä³ÉÒ»¸öÕûÊýÀ´½øÐÐ·Ö×éµÄ¡£ÏÂÃæÊÇÒ»¸ö¶þ´Î·Ö×éµÄÀý×Ó¡£ÕâÀïµÄÓÃÁËÉÏÃæµÄµÚ¶þ¸ögroupingBy()·½·¨£¬²¢ÔÚdownstreamÖÐÖ¸¶¨ÁËÁíÒ»¸ö·Ö×é²Ù×÷¡£
 
     Map<Integer, Map<Integer, List<Student>>> map = stream.collect(Collectors.groupingBy(new Function<Student, Integer>() {
         @Override
@@ -232,8 +232,19 @@ groupingBy·½·¨ÓÐ3¸öÖØÔØµÄ°æ±¾£¬ÕâÀïÎÒÃÇ¸ø³öÆäÖÐ³£ÓÃµÄÁ½¸ö¡£µÚÒ»¸ö·½·¨ÊÇÍ¨¹ýÖ¸¶¨¹
 	
 ### 9.5 ·ÖÇø
 
+Óë·Ö×éÀàËÆµÄ»¹ÓÐÒ»¸ö·ÖÇøµÄ²Ù×÷£¬·ÖÇøÖ»ÊÇ·Ö×éµÄÒ»ÖÖÌØÀý¡£ËüÃÇµÄÊ¹ÓÃ·½Ê½Ò²»ù±¾Ò»ÖÂ£¬ËüµÄ·½·¨Ç©ÃûÓëÉÏÃæµÄgroupingBy·½·¨ÀàËÆ¡£ÎÒÃÇÖ±½Ó¿´ËüµÄÒ»¸öÊ¹ÓÃµÄ·½Ê½ºÃÁË£º
 
+    Map<Boolean, List<Student>> map = stream.collect(Collectors.partitioningBy(new Predicate<Student>() {
+        @Override
+        public boolean test(Student student) {
+            return student.getGrade() > 90;
+        }
+    }));
 
+Õâ¾ÍÊÇ·ÖÇøµÄÊ¹ÓÃ·½Ê½¡£ËüÍ¨¹ýÒ»¸öÖ¸¶¨µÄº¯ÊýÊ½½Ó¿Ú£¬½«Ö¸¶¨µÄÀàÐÍÓ³Éäµ½Ò»¸ö²¼¶ûÀàÐÍ¡£ËùÒÔ£¬ËüÀàËÆÓë·Ö×é£¬Ö»²»¹ýËü·Ö×éµÄ½á¹ûÖ»ÓÐÁ½ÖÖ£¬ÒªÃ´true£¬ÒªÃ´false¡£µ±È»£¬ÀàËÆÓÚ·Ö×é£¬ÄãÒ²¿ÉÒÔÔÚpartitioningBy()·½·¨µÄµÚ¶þ¸ö²ÎÊýÖÐÔÙÖ¸¶¨Ò»¸öÊÕ¼¯Æ÷£¬ÕâÑù¾Í¿ÉÒÔ¶Ô·ÖÇøºóµÄÁ÷½øÐÐºóÐøµÄ²Ù×÷ÁË¡£
 
+## ×Ü½á£º
+
+ÒÔÉÏ¾ÍÊÇJava8ÖÐµÄÁ÷µÄ³£¼ûµÄÓÃ·¨£¬ÕâÀïÖ»ÊÇÁÐ¾ÙÁËÒ»Ð©³£¼ûµÄ¡¢Java8 APIÖÐÌá¹©µÄÒ»Ð©ÀàºÍ·½·¨¡£ÖØµãÈÔÈ»ÊÇ¸ãÇå³þÆäÖÐµÄÉè¼ÆµÄÔ­Àí£¬²»ÒªÃ¤Ä¿¼ÇÒä¡£Ñ§Ï°µÄÊ±ºò½áºÏJDKÔ´Âë½øÐÐ£¬¿´µ½·½·¨µÄ¶¨Òå¾Í´óÖÂÁË½âÁËËüµÄÉè¼ÆÔ­Àí¡£×îºó£¬²»µÃ²»ËµµÄÊÇ£¬Ê¹ÓÃÁ÷±à³ÌÈ·ÊµºÜ¼ò½àºÍÓÅÑÅ¡£
  
-	
+Ïà¹Ø´úÂë£º
