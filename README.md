@@ -30,6 +30,7 @@
 9. <a href="#java_8">Java 8</a>
 10. <a href="#container">容器</a>
     1. <a href="#tomcat">Tomcat</a>
+11. <a href="#others">其他</a>
 
 ------
 
@@ -215,9 +216,12 @@
 |4|[《How Tomcat Works》笔记4](Tomcat/HTW_note4.md)|
 |5|[《How Tomcat Works》笔记5](Tomcat/HTW_note5.md)|
 
-## 其他
+<h2 id="others">其他</h2>
 
-1. [Linux命令](linux命令.md)
-2. [正则表达式语法](正则表达式.md)
-3. [进程间通信](进程间通信.md)
-4. [一致性哈希算法](一致性哈希算法.md)
+|编号|名称|
+|:-:|:-:|
+|1|[Linux命令](linux命令.md)|
+|2|[正则表达式语法](正则表达式.md)|
+|3|[进程间通信](进程间通信.md)|
+|4|[一致性哈希算法](一致性哈希算法.md)|
+|5|[字符编码](字符编码.md)|
