@@ -1,3 +1,113 @@
+# Spring IOC
+
+## 1、环境搭建
+
+使用IDEA，创建Maven-WebApp。然后，我们进行如下的配置：
+
+### 1.1 Java 8 环境的配置
+
+需要在pom.xml的build标签中加入如下的配置：
+
+    <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.1</version>
+    <configuration>
+        <source>1.8</source>
+        <target>1.8</target>
+    </configuration>
+    </plugin>
+
+配置完成之后，我们就可以在代码中直接使用Java8来进行编程了。
+
+### 1.2 Spring 开发环境
+
+这里，我们一次性导入Spring开发需要的基本的配置，不仅包括了IOC相关内容，同时也包括Test和Aop等模块：
+
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-aop</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-aspects</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+
+注意一下这里我们没有直接在依赖中配置需要的版本号，而是统一放在properties标签中：
+
+    <properties>
+        <spring.version>4.3.10.RELEASE</spring.version>
+    </properties>
+
+好了，至此我们的Spring开发环境已经搭建完毕，接下来就让我们使用一个基本的例子来检验一下我们的环境是否搭建成功。
+
+### 1.3 环境测试：一个简单的注入的例子
+
+简单交待一下，这里我们定义了一个接口`IHelloApi`，然后定义一个它的实现类`HelloApiImpl`：
+
+    public interface IHelloApi {
+        void sayHelloWorld();
+    }
+
+	public class HelloApiImpl implements IHelloApi {
+        @Override
+        public void sayHelloWorld() {
+            System.out.println("Hello world!");
+        }
+    }
+	
+然后，我们在`main`目录下面创建一个名为`resources`的目录，并使用鼠标右键单击，选择`Mark as`->`Resources Root`。
+然后，在该目录中创建一个名为`HelloWorld.xml`的文件，并在文件中配置我们的Bean：
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+        <!--这里的calss属性的值就是我们要配置的实例的具体位置-->
+        <bean id="hello" class="me.shouheng.spring.hello.beanimp.HelloApiImpl"/>
+    </beans>
+
+然后，我们创建一个测试类`HelloWorldTest`，这里我们用`ClassPathXmlApplicationContext`来获取一个上下文，并从其中来获取Bean实例并使用：
+
+    public class HelloWorldTest {
+        public static void main(String...args) {
+            ApplicationContext context = new ClassPathXmlApplicationContext("HelloWorld.xml");
+            IHelloApi helloApi = (IHelloApi) context.getBean("hello");
+            helloApi.sayHelloWorld();
+        }
+    }
+
+根据，我们定义的Bean实例。如果能正确地输出`Hello world!`，那么我们的环境就算是搭建成功了。
+
+
+
+
+
+
+	
 
 ## 1. 依赖注入
 
@@ -10,13 +120,13 @@
 	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	       xmlns:context="http://www.springframework.org/schema/context"
 	       xsi:schemaLocation="http://www.springframework.org/schema/beans 
-           http://www.springframework.org/schema/beans/spring-beans.xsd 
-           http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
 
 	    <bean id="component" class="org.restlet.ext.spring.SpringComponent">
-            <!--要求component内部必须具有setDefaultTarget方法，不一定非得是名为defaultTarget的字段-->
-	        <property name="defaultTarget" ref="restServer"/>
+        <!--要求component内部必须具有setDefaultTarget方法，不一定非得是名为defaultTarget的字段-->
+	    <property name="defaultTarget" ref="restServer"/>
 	    </bean>
 	
 	</beans>
@@ -42,8 +152,8 @@
 5. 除了使用Setter方法注入，还可以使用构造函数注入，要用到`<constructor-arg>`标签，规则和使用Setter方法注入相似；
 6. 使用构造方法注入时，参数列表中的顺序是不重要的，这意味着参数列表(A a, B b)和(B b, A a)的调用方式是一样的，如果在一个类内部存在这样两个构造函数就会存在歧义。此时，可以在每个`<constructor-arg>`标签中加入一个index，用来指定指定参数在参数列表中的位置。像这样：
 
-        <constructor-arg ref="A" index=0>
-        <constructor-arg ref="B" index=1>
+    <constructor-arg ref="A" index=0>
+    <constructor-arg ref="B" index=1>
 
 7. 使用构造函数注入的另一个问题是**循环依赖**，即A和B，A在构造方法中引用了B，B在构造方法中引用了A，那么A实例化的时候需要B，B实例化时需要A，就会抛出异常。解决方法是杜绝循环依赖，尽量使用Setter注入方式。
 
@@ -56,7 +166,7 @@
 	    private PalmJaxBeanCollection palmJaxBeanCollection;
 	
 	    public <T> T getInstance(Class<T> aClass) throws InstantiateException {
-	        return palmJaxBeanCollection.getBean(aClass);
+	    return palmJaxBeanCollection.getBean(aClass);
 	    }
 	}
 
@@ -90,14 +200,14 @@
 	
 	    @Bean
 	    public BeanA beanA() {
-	        BeanA beanA = new BeanA();
-	        beanA.setB(beanB());
-	        return beanA;
+	    BeanA beanA = new BeanA();
+	    beanA.setB(beanB());
+	    return beanA;
 	    }
 	
 	    @Bean
 	    public BeanB beanB() {
-	        return new BeanB();
+	    return new BeanB();
 	    }
 	}
 
@@ -169,15 +279,15 @@
 #### 1.bean标签中的parent
 
     <bean id="securityContextInterceptor" abstract="true"
-          class="com.oo.ejb3.interceptor.SecurityContextInterceptor">
-        <property name="loginHistoryService" ref="loginHistoryService"/>
-        <property name="sysAutoUpdateDAO" ref="sysAutoUpdateDAOImpl"/>
+      class="com.oo.ejb3.interceptor.SecurityContextInterceptor">
+    <property name="loginHistoryService" ref="loginHistoryService"/>
+    <property name="sysAutoUpdateDAO" ref="sysAutoUpdateDAOImpl"/>
     </bean>
 
     <bean parent="securityContextInterceptor">
-        <property name="businessInterface"
-                  value="com.oo.ejb3.system.sessionbean.WSUserService"/>
-        <property name="target" ref="userService"/>
+    <property name="businessInterface"
+          value="com.oo.ejb3.system.sessionbean.WSUserService"/>
+    <property name="target" ref="userService"/>
     </bean>
 
 有时候，我们会遇到像上面这种情况——在bean标签中使用了parent。这里和模板设计模式（或者策略）的理念相似，即使用parent指定的那个bean是一个模板的基类，在子类中我们会按照子类的要求为其中的字段赋不同的值，来得到一个新的Bean。
