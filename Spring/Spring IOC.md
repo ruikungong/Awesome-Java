@@ -1,5 +1,47 @@
 # Spring IOC
 
+## 1、Spring Ioc的基本原理
+
+Spring Ioc容器的代表就是`BeanFactory`接口，它其中定义了一些获取Bean的方法`getBean()`。
+`ApplicationContext`接口扩展了`BeanFactory`，还提供了与Spring AOP集成、国际化处理、事件传播及提供不同层次的context实现。
+我们可以从`BeanFactory`和`ApplicationContext`任选一个来使用，但是`BeanFactory`过于低级，所以`ApplicationContext`用得更加广泛。
+
+`ApplicationContext`有多个具体的实现，可以供我们从不同类型的配置文件中获取Bean。以下是比较常用的一些：
+
+1. **AnnotationConfigApplicationContext**：从一个或多个基于Java的配置类中加载应用上下文
+2. **AnnotationConfigWebContextLoader**：从一个或多个基于Java配置类中加载Web应用上下文
+3. **ClassPathXmlApplicationContext**：从类路径下面一个或多个配置文件中加载上下文
+4. **FileSystemXmlApplicationContext**：从文件系统中的一个或多个配置文件中加载上下文
+
+当获取到了`ApplicationContext`之后，我们就可以使用它来获取Bean实例。`ApplicationContext`提供了一些方法来供我们获取Bean：
+
+    Object getBean(String var1) throws BeansException;
+    <T> T getBean(Class<T> var1) throws BeansException;
+    <T> Map<String, T> getBeansOfType(Class<T> var1) throws BeansException;
+
+这里我们给的是三种基本的方法，它们还有一些多态的方法。与其区别仅在于，增加了一些可选的参数。
+
+## 2、Ioc的配置
+
+### 2.1 Xml配置的结构
+
+    <beans>
+         <bean id="hello" class="me.shouheng.spring.hello.beanimp.HelloApiImpl"/>
+    </beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 1. 依赖注入
 
 ### 1.基于XML的配置方式
