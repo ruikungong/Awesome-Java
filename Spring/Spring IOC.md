@@ -82,61 +82,88 @@ Ioc容器中的Bean使用反射来创建。可以使用无参构造函数，也�
 这里，我们在FactoryBean中定义了一个工厂方法`factory`，它接受两个参数`hiTo1`和`hiTo2`。在上面的代码中，我们先创建了该工厂Bean，名为`factory`。
 然后，在创建`universal5`的时候，分别使用`factory-bean`指定对应的工厂Bean和`factory-method`指定该Bean中的工厂方法。
 
+## 3、依赖注入
 
+除了使用构造方法向创建的实例中设置值，还可以通过`setter`方法（Spring要求方法的内容确实符合setter方法的要求）对实例的属性进行设置。
+而且它的配置方式与使用构造方法大同小异，区别在于：
+
+1. 首先它要求指定的属性确实提供了Setter方法；
+2. 我们可以在bean标签中使用`property`子标签来设置属性的值，它的配置方式与`constructor-arg`非常相似。
+
+### 3.1 注入值和引用
+
+这里我们定义了两个类DiBean和RefBean，其中的DiBean有一个类型为String的`message`字段，我们这里使用`property`为其注入值`So what?`。
+而RefBean中有一个类型为DiBean的字段`diBean`，这里我们定义一个Bean并通过`property`的`ref`属性指定它引用的Bean：
+
+    <bean id="di" class="me.shouheng.spring.di.DiBean">
+    <property name="message" value="So what?"/>
+    </bean>
+
+    <bean id="refBean" class="me.shouheng.spring.di.RefBean">
+    <property name="diBean" ref="di"/>
+    </bean>
+
+### 3.2 注入列表、字典和其他类型的值
 	
-	
+除了注入一些字符串常量还有引用Bean，`property`标签还为我们提供了更加丰富的功能，我们可以使用它们来完成更加多样化的注入。
+
+为了测试Spring注入其他类型实例的能力，我们定义了一个名为DiMulti的类。它有一个名为`names`的`List<String>`类型的字段，然后我们可以像下面这样为其注入值：
+
+    <bean id="diMulti" class="me.shouheng.spring.di.DiMulti">
+      <property name="names">
+        <list>
+        <value>Chen</value>
+        <value>Li</value>
+        <value>Xu</value>
+        </list>
+      </property>
+    </bean>
+
+如果你是在IDEA中使用的话，那么你基本可以懂得其他的类型该如何配置了：在`property`标签中有许多其他的子标签，
+我们可以通过`property`标签的`name`属性指定要注入的字段的名称，然后再使用`property`的子标签来组装我们需要注入的各种类型的值。
+
+### 3.3 p命名空间
+
+你可以使用p命名空间来简化setter注入，比如上面的`refBean`可以使用如下的方式进行简化：
+
+    <bean id="refBean" class="me.shouheng.spring.di.RefBean" p:diBean-ref="di"/>
+
+注意这里需要引用p命名空间：
+
+    xmlns:p="http://www.springframework.org/schema/p"
+
+我们看它的规则其实就是`p:字段名="值"`，如是字段是引用类型，那么就是`p:字段名-ref=“Bean的id”`
+
+## 4、循环依赖
+
+所谓的循环依赖就是：A创建的时候需要使用B，B需要用到C，而C又要用到A。按照注入的方式不同又分成：**构造器循环依赖**和**setter方法循环依赖**。
+
+构造器循环依赖表示Bean在创建的时候依赖于其他的Bean而造成的循环依赖，此种循环依赖无解，只能通过抛出BeanCurrentlyInCreationException异常表示循环依赖。
+
+对于setter方法循环依赖又分成两种情形：**单例作用域的循环依赖**和**prototype作用域的循环依赖**。前者是可以解决的，而后者无法解决。
+因为单例作用域的Bean在创建之后会被放在Bean创建池中待用，而prototype作用域的Bean不会被Spring容器缓存，无法提前暴露创建完毕的Bean。
+
+## 5、Bean的作用域
+
+### 5.1 Bean的基本作用域
+
+Bean的基本作用域有下面两种：
+
+1. **singleton**：单例作用域，表示每个Spring Ioc容器中只会存在一个实例，而且其完整生命周期完全由Spring容器管理。
+Spring容器中如果没有指定作用域默认就是单例的，配置的方式也很简单就是通过在bean标签中使用`scope`属性指定值为`singleton`。
+如果Bean是延迟初始化的，那么该Bean会在首次使用的时候创建并放在单例缓存池中。
+2. **prototype**：原型，指每次向Spring容器请求获取Bean都返回一个全新的Bean，相对于“singleton”来说就是不缓存Bean，每次都是一个根据Bean定义创建的全新Bean。
+
+### 5.2 Bean在Web应用中的作用域
+
+1. **request作用域**：表示每个请求需要容器创建一个全新Bean。比如提交表单的数据必须是对每次请求新建一个Bean来保持这些表单数据，请求结束释放这些数据。
+2. **session作用域**：表示每个会话需要容器创建一个全新Bean。比如对于每个用户一般会有一个会话，该用户的用户信息需要存储到会话中，此时可以将该Bean配置为web作用域。
+3. **globalSession**：类似于session作用域，只是其用于portlet环境的web应用。如果在非portlet环境将视为session作用域。
 
 
 
 
 
-## 1. 依赖注入
-
-### 1.基于XML的配置方式
-
-下面是基于XML配置的一个xml文件：
-
-	<?xml version="1.0" encoding="UTF-8"?>
-	<beans xmlns="http://www.springframework.org/schema/beans"
-	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	       xmlns:context="http://www.springframework.org/schema/context"
-	       xsi:schemaLocation="http://www.springframework.org/schema/beans 
-       http://www.springframework.org/schema/beans/spring-beans.xsd 
-       http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context.xsd">
-
-	    <bean id="component" class="org.restlet.ext.spring.SpringComponent">
-        <!--要求component内部必须具有setDefaultTarget方法，不一定非得是名为defaultTarget的字段-->
-	    <property name="defaultTarget" ref="restServer"/>
-	    </bean>
-	
-	</beans>
-
-说明：
-
-1. 需要将`<bean>`标签定义在`<beans>`标签内部；
-2. 使用基于XML注解的时候是不需要`<context:component-scan base-package="..."/>`标签的；
-3. 如果想要为某个Bean中的字段注入值，可以在指定的`<bean>`标签内部使用`<property>`标签。需要注意的地方是，使用基于XML的注入的方式的时候，`<property>`标签中的**name是与指定字段的setter方法相关**的，而不是与字段名称相关的，并且该Bean内部**必须具有指定的Setter方法**。而当使用@Autowired的时候是不需要改Bean中的指定字段的Setter方法的，使用@Autowired的时候是根据Bean的类型来进行注入的（使用@Autowired的时候无法为非Bean字段注入）。
-4. 其他值类型的注入方法：
-		
-		<property name="title" value="RoseIndia"/>
-		<property name="authorsInfo"> 
-		<map>
-		<entry key="1" value="Deepak" />
-		<entry key="2" value="Arun"/>
-		<entry key="3" value="Vijay" />
-		</map>
-		</property>
- 
-    也是使用`<property>`标签，如果是基本数据类型，使用vlaue进行赋值；而`<map>`、`<set>`、`<list>`及`<array>`，则分别用来为Collection容器类型和数组类型赋值。
-
-5. 除了使用Setter方法注入，还可以使用构造函数注入，要用到`<constructor-arg>`标签，规则和使用Setter方法注入相似；
-6. 使用构造方法注入时，参数列表中的顺序是不重要的，这意味着参数列表(A a, B b)和(B b, A a)的调用方式是一样的，如果在一个类内部存在这样两个构造函数就会存在歧义。此时，可以在每个`<constructor-arg>`标签中加入一个index，用来指定指定参数在参数列表中的位置。像这样：
-
-    <constructor-arg ref="A" index=0>
-    <constructor-arg ref="B" index=1>
-
-7. 使用构造函数注入的另一个问题是**循环依赖**，即A和B，A在构造方法中引用了B，B在构造方法中引用了A，那么A实例化的时候需要B，B实例化时需要A，就会抛出异常。解决方法是杜绝循环依赖，尽量使用Setter注入方式。
 
 ### 2.基于注解的配置方式
 
