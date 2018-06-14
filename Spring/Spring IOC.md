@@ -25,18 +25,66 @@ Spring Ioc容器的代表就是`BeanFactory`接口，它其中定义了一些获
 
 ### 2.1 Xml配置的结构
 
+当我们使用XML来配置bean的时候，其基本的格式如下。这里我们省略了命名空间的声明。下面是一个基本的结构，在`beans`标签中主要用三种类型标签供我们使用：
+
     <beans>
-         <bean id="hello" class="me.shouheng.spring.hello.beanimp.HelloApiImpl"/>
+        <import resource="../hello/HelloWorld.xml"/>
+        <bean id="universal" class="me.shouheng.spring.universal.UniversalBean"/>
+        <alias name="universal" alias="my_universal"/>
     </beans>
 
+其中的`import`标签用于导入其他的XML配置文件，这样就可以在这一个文件中使用其他文件中的Bean。然后是bean标签，它用来声明一个bean的定义。
+最后是`alias`标签，它用来为一个Bean起一个别名。
+	
+Bean在容器中由`BeanDefinition`对象表示，`BeanDefinition`是一个接口，内部定义了一个Bean对象的基本的属性信息，比如是否单例的、作用范围、是否延迟初始化等等。
+
+我们之前由提到过从上下文中获取Bean的几个方法，当传入的是字符串的时候就会根据`id`或者`name`或者`alias`指定的名称进行加载。也可以通过传入类型来加载指定类型的Bean。
+
+一个Bean只能有一个`id`和一个别名，如果同时指定了`name`和`id`，那么`name`就成了别名。`id`在Ioc容器中必须是唯一的。另外，可以指定多个name，并用`,`、`;`、` `分割。
+
+Bean的命名遵循XML命名规范，但最好符合Java命名规范，也就是驼峰风格的命名。
+
+### 2.2 实例化Bean
+
+Ioc容器中的Bean使用反射来创建。可以使用无参构造函数，也可以使用含参构造函数。
+
+#### 2.2.1 通过构造方法直接获取实例
+
+我们在UniversalBean类中增加一个构造方法，该方法中包含一个名为`hiTo`的参数，那么我们可以使用下面的方式来通过传入该参数来获取一个Bean的实例：
+
+    <bean id="universal2" class="me.shouheng.spring.universal.UniversalBean">
+        <constructor-arg name="hiTo" value="Spring"/>
+    </bean>
+
+这里当构造函数只存在一个参数的时候，我们可以这么去写：使用`name`指定参数的名称，使用`value`指定参数的值。当构造函数存在多个参数的时候，我们就需要声明多个`constructor-arg`标签。
+
+#### 2.2.2 通过静态工厂方法获取实例
+
+我们在UniversalBean类增加一个工厂方法，它接受两个参数`hiTo1`和`hiTo2`，然后我们可以用下面的方式在XML中配置：
+
+    <bean id="universal4" class="me.shouheng.spring.universal.UniversalBean" factory-method="staticFactory">
+        <constructor-arg name="hiTo1" value="Spring"/>
+        <constructor-arg name="hiTo2" value="Winter"/>
+    </bean>
+
+也就是相对于普通的定义方式，在bean标签中又增加了一个`factory-method`属性，并指定该属性的值是静态工厂方法的名字。然后，我们在该标签内通过两个`constructor-arg`标签指定参数的值即可。
+
+#### 2.2.3 通过实例工厂方法获取实例
+
+在这种方式中，我们需要先创建一个工厂Bean，然后创建Bean的时候指定工厂Bean及其工厂方法。
+
+    <bean id="factory" class="me.shouheng.spring.universal.FactoryBean"/>
+    <bean id="universal5" factory-bean="factory" factory-method="factory">
+        <constructor-arg name="hiTo1" value="Spring"/>
+        <constructor-arg name="hiTo2" value="Winter"/>
+    </bean>
+
+这里，我们在FactoryBean中定义了一个工厂方法`factory`，它接受两个参数`hiTo1`和`hiTo2`。在上面的代码中，我们先创建了该工厂Bean，名为`factory`。
+然后，在创建`universal5`的时候，分别使用`factory-bean`指定对应的工厂Bean和`factory-method`指定该Bean中的工厂方法。
 
 
-
-
-
-
-
-
+	
+	
 
 
 
