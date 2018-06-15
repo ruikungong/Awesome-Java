@@ -25,6 +25,8 @@
 5. **后置最终通知(After finally Advice)**: 在切入点选择的连接点处的方法返回时执行的通知，不管抛没抛出异常都执行，类似于Java中的finally块。
 6. **环绕通知(Around Advices)**：环绕通知可以在方法调用之前和之后自定义任何行为，并且可以决定是否执行连接点处的方法、替换返回值、抛出异常等等。
 
+你不必去记忆这种东西，考虑一下一个方法从开始到执行结束，其实上面的几个通知类型也就是覆盖了所有可能出现的情况。
+
 ### 1.3 其他
 
 Spring使用JDK动态代理或CGLIB代理来实现
@@ -62,8 +64,67 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 `pointcut`是所有方法的一个合集，我们使用`expression`来指定这些方法的规则。
 `aspect`整合了切入点和通知，它需要引用Bean，并且在子标签中将通知类型、要执行的方法和切入点结合起来。
 
-另外，还需要注意的一点是，切入点和切面都可以被定义多个，但是是有顺序要求的。
+另外，还需要注意的见点是，切入点和切面都可以被定义多个，但是是有顺序要求的。除了使用`pointcut-ref`引用某个切入点，还可以使用匿名的切入点：
 
+    <aop:after method="say" pointcut="execution(* me.shouheng.spring.aop.Worker.*(..)))"/>
+
+## 3、更加复杂的功能
+
+OK，实际上当我们去看AOP的配置的时候还是比较费解的，如果你是第一次接触它的话。那么，我们抛开相关文档，自己去想一下实际开发过程中可能会需要哪些功能，并看它们如何配置和实现好了。
+
+我们从几个通知作为思考的起点：
+
+1. 前置通知：我想要知道方法的所有入参，我可以用它来记录一些日志
+2. 后置返回通知：我想要知道返回的结果是什么，我可以把不机密但重要的信息放在日志里面
+3. 后置异常通知：我想要知道具体出现的异常的类型和异常的具体信息，以把它们记录到日志中，或者根据具体的错误原因做一些其他的处理，比如翻译之后返回给客户端
+4. 后置最终通知：同上
+5. 环绕通知：同上
+
+所以，总结一下我们想要获取的无非下面三个信息:
+
+1. 方法的参数
+2. 方法的返回结果
+3. 异常的详情
+
+那么，我们接下来就看使用AOP如何获取这三个信息。
+
+### 3.1 获取方法的入参
+
+如下所示，我们这里企图拦截Worker类中的所有的包含一个名为`words`参数的方法，然后我们使用`logLog`的`sayWords`方法进行拦截，并在方法执行之前输出该参数：
+
+    <aop:aspect ref="logLog">
+        <aop:pointcut id="pointcut" expression="execution(* me.shouheng.spring.aop.Worker.working(..)) and args(words)"/>
+        <aop:before pointcut-ref="pointcut" method="sayWords" arg-names="words"/>
+    </aop:aspect>
+
+注意，这里我们在切点的定义中使用`and`表示要符合两种情况，我们也可以用两个`&&`（在XML中是`&amp;&amp;`）来表示，但是显然前者更加简洁。
+当我们要拦截的方法中包含多个参数的时候，也可以同时在`args`中指定，只要注意用`,`分隔开即可。
+
+### 3.2 获取方法的返回结果
+
+为了测试获取方法返回结果，我们在`Worker`中增加了一个新的方法`makeA()`，它返回一个字符串类型的数据。我们按照如下所示的方式来获取并使用方法的返回结果：
+
+    <aop:aspect ref="logLog">
+        <aop:pointcut id="p2" expression="execution(* me.shouheng.spring.aop.Worker.makeA())"/>
+        <aop:after-returning method="sayWords" pointcut-ref="p2" returning="words"/>
+    </aop:aspect>
+
+在定义了切点之后，我们使用`aop:after-returning`标签来获取方法的返回值并对其进行处理。这里我们用了`logLog`的`sayWords()`方法，使用`returning`属性指定返回值应用到`sayWords()`方法的参数的名称。
+
+以上程序执行的最终效果就是，在执行了`makeA()`方法之后，将返回的结果作为`words`参数传入到`sayWords()`方法中。
+
+需要注意的地方是，需要使用`aop:after-returning`标签才能获取方法的返回结果并进行处理。
+
+### 3.3 获取方法的执行的异常
+
+为了测试拦截异常的逻辑，我们需要在LogLog类中增加一个方法`handleError(Throwable throwable)`。我们还要在Worker中定义一个`throwMethod()`方法，它内部抛出一个异常。然后我们进行如下的配置：
+	
+    <aop:aspect ref="logLog">
+        <aop:pointcut id="p3" expression="execution(* me.shouheng.spring.aop.Worker.throwMethod())"/>
+        <aop:after-throwing method="handleError" pointcut-ref="p3" throwing="throwable"/>
+    </aop:aspect>
+
+拦截异常和拦截方法执行结果的逻辑类似，我们需要指定一个方法，然后在`throwing`属性中指定该方法中的参数的名称。当抛出异常的时候，就会把异常作为该参数传入到方法中，我们可以在方法中对异常进行处理。
 
 
 
