@@ -126,6 +126,46 @@ OK，实际上当我们去看AOP的配置的时候还是比较费解的，如果
 
 拦截异常和拦截方法执行结果的逻辑类似，我们需要指定一个方法，然后在`throwing`属性中指定该方法中的参数的名称。当抛出异常的时候，就会把异常作为该参数传入到方法中，我们可以在方法中对异常进行处理。
 
+## 4、使用@Aspect配置AOP
+
+除了使用schema基于XML配置AOP，还可以使用注解来进行配置。Spring默认不支持@AspectJ风格的切面声明，为了支持需要使用如下配置：
+
+    <aop:aspectj-autoproxy/>  
+
+然后，我们就可以进行配置和使用了。使用注解的方式和使用XML配置的方式基本类似，我们看下下面的代码。
+
+首先是切面的定义：
+
+	@Aspect
+	public class AspectObj {
+
+		@Pointcut(value = "execution(* me.shouheng.spring.aspect.*.*(..)) && args(params)", argNames = "params")
+		public void pointcut(String params) { }
+
+		@Before(value = "pointcut(params)", argNames = "params")
+		public void before(String params) {
+			System.out.println("================= before =================");
+		}
+	}
+
+这里我们使用`@Aspect`注解，它表明该类是一个切面。然后，我们定义一个方法体为空的方法，并使用`@Pointcut`注解，表明它是一个切点。可以看出它的配置方式和使用XML基本一样。
+
+然后，我们需要定义一个通知，这里我们用的是前置通知，我们用`@Before`注解声明方法为前置通知，并指定切点和方法的参数名。
+
+配置完这些之后，我们定义一个测试类，来看一下我们的是否能够在方法执行之前拦截到方法，并获取到方法的参数。我们定义一个名为HelloAspect的类，并在其中定义一个方法：
+
+    public void sayHello(String params) {
+        System.out.println("Hello, " + params);
+    }
+
+这样我们需要在XML中将上述定义的两个类作为Bean声明在XML中，这样它们就可以被IoC管理了。OK，我们获取上下文之后调用Bean的方法确实可以达到我们预期的效果。
+
+以上是基于注解的AOP的基本配置方式，其他类型的通知的配置方式与其基本相似，我们只要知道其中的逻辑就可以了，没必要面面俱到。
+
+
+
+
+	
 
 
 
