@@ -178,8 +178,8 @@
 
 |编号|名称|
 |:-:|:-:|
-|1|[控制反转和依赖注入](Spring/Spring IOC.md)|
-|2|[Spring 切面AOP](Spring/Spring AOP.md)|
+|1|[控制反转和依赖注入](Spring/Spring_IOC.md)|
+|2|[Spring 切面AOP](Spring/Spring_AOP.md)|
 |3|[Spring事务管理](Spring/Spring事务管理.md)|
 |4|[Spring MVC](Spring/SpringMVC.md)|
 
