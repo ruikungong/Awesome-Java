@@ -20,7 +20,7 @@
 	4. <a href="#mongodb">Mongodb</a>
 7. 服务端框架
     1. <a href="#spring">Spring</a>
-	2. <a href="#spring_mvc">Spring MVC</a>
+	2. <a href="#spring">Spring MVC</a>
 	3. <a href="#mybatis">Mybatis</a>
 8. Java第三方库
     1. <a href="#guava">Guava</a>
@@ -176,13 +176,12 @@
 
 <h3 id="spring">Spring</h3>
 
-1. [依赖注入](Spring/Bean注入.md)
-2. [AOP](Spring/AOP.md)
-3. [Spring事务管理](Spring/Spring事务管理.md)
-
-<h3 id="spring_mvc">Spring MVC</h3>
-
-[Spring MVC](Spring/SpringMVC.md)
+|编号|名称|
+|:-:|:-:|
+|1|[控制反转和依赖注入](Spring/Spring IOC.md)|
+|2|[Spring 切面AOP](Spring/Spring AOP.md)|
+|3|[Spring事务管理](Spring/Spring事务管理.md)|
+|4|[Spring MVC](Spring/SpringMVC.md)|
 
 <h3 id="mybatis">MyBatis</h3>
 
