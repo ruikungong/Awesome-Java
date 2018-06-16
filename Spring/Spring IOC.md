@@ -69,6 +69,8 @@ Ioc容器中的Bean使用反射来创建。可以使用无参构造函数，也�
 
 也就是相对于普通的定义方式，在bean标签中又增加了一个`factory-method`属性，并指定该属性的值是静态工厂方法的名字。然后，我们在该标签内通过两个`constructor-arg`标签指定参数的值即可。
 
+对应于`constructor-arg`的有简化版的`c`命名空间可以使用，使用该命名空间使代码看上去更加简洁。
+
 #### 2.2.3 通过实例工厂方法获取实例
 
 在这种方式中，我们需要先创建一个工厂Bean，然后创建Bean的时候指定工厂Bean及其工厂方法。
@@ -134,7 +136,9 @@ Ioc容器中的Bean使用反射来创建。可以使用无参构造函数，也�
 
 我们看它的规则其实就是`p:字段名="值"`，如是字段是引用类型，那么就是`p:字段名-ref=“Bean的id”`
 
-## 4、循环依赖
+## 4、DI的其他知识
+
+### 4.1 循环依赖
 
 所谓的循环依赖就是：A创建的时候需要使用B，B需要用到C，而C又要用到A。按照注入的方式不同又分成：**构造器循环依赖**和**setter方法循环依赖**。
 
@@ -143,9 +147,9 @@ Ioc容器中的Bean使用反射来创建。可以使用无参构造函数，也�
 对于setter方法循环依赖又分成两种情形：**单例作用域的循环依赖**和**prototype作用域的循环依赖**。前者是可以解决的，而后者无法解决。
 因为单例作用域的Bean在创建之后会被放在Bean创建池中待用，而prototype作用域的Bean不会被Spring容器缓存，无法提前暴露创建完毕的Bean。
 
-## 5、Bean的作用域
+### 4.2 Bean的作用域
 
-### 5.1 Bean的基本作用域
+#### 4.2.1 Bean的基本作用域
 
 Bean的基本作用域有下面两种：
 
@@ -154,152 +158,147 @@ Spring容器中如果没有指定作用域默认就是单例的，配置的方�
 如果Bean是延迟初始化的，那么该Bean会在首次使用的时候创建并放在单例缓存池中。
 2. **prototype**：原型，指每次向Spring容器请求获取Bean都返回一个全新的Bean，相对于“singleton”来说就是不缓存Bean，每次都是一个根据Bean定义创建的全新Bean。
 
-### 5.2 Bean在Web应用中的作用域
+#### 4.2.2 Bean在Web应用中的作用域
 
 1. **request作用域**：表示每个请求需要容器创建一个全新Bean。比如提交表单的数据必须是对每次请求新建一个Bean来保持这些表单数据，请求结束释放这些数据。
 2. **session作用域**：表示每个会话需要容器创建一个全新Bean。比如对于每个用户一般会有一个会话，该用户的用户信息需要存储到会话中，此时可以将该Bean配置为web作用域。
 3. **globalSession**：类似于session作用域，只是其用于portlet环境的web应用。如果在非portlet环境将视为session作用域。
 
+### 4.3 延迟初始化
 
+延迟初始化的Bean只有在用到的时候才会被初始化，它的配置方式很简单只需在<bean>标签上指定`lazy-init`属性值为`true`即可延迟初始化Bean。
 
+延迟初始化适用于可能需要加载很大资源，而且很可能在整个应用程序生命周期中很可能使用不到的Bean。
 
+在`<beans>`标签中通过制定default-lazy-init="true"可以将内部全部bean延迟初始化。
 
+### 4.4 depends-on
 
-### 2.基于注解的配置方式
+有两个Bean，分别是A和B，我们在A的配置中设置它的depends-on属性为B，那么A会在B初始化完成之后再被创建，而B要等到A销毁了之后才能被销毁。
 
-	@Service
-	public class PalmSpringJaxObjectFactory implements ObjectFactory {
-	
-	    @Autowired
-	    private PalmJaxBeanCollection palmJaxBeanCollection;
-	
-	    public <T> T getInstance(Class<T> aClass) throws InstantiateException {
-	    return palmJaxBeanCollection.getBean(aClass);
-	    }
-	}
+### 4.5 init-method和destroy-method
 
-所需的xml配置文件
+在使用XML配置Bean的时候，可以在Bean标签中通过这init-method和destroy-method分别指定初始化时和销毁时调用的方法：
 
-	<?xml version="1.0" encoding="UTF-8"?>
-	<beans xmlns="http://www.springframework.org/schema/beans"
-	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	       xmlns:context="http://www.springframework.org/schema/context"
-	       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-	
-	    <context:component-scan base-package="my.shouheng.palmcollege.facade.*"/>
-	
-	</beans>
+1. init-method ：指定初始化方法，在构造器注入和setter注入完毕后执行；
+2. destroy-method：指定销毁方法，只有`singleton`作用域能销毁，`prototype`作用域的一定不能，其他作用域不一定能；
+3. 可以使用@PostConstruct和@PreDestroy注解标记指定的方法来实现生命周期回调，要使用这种方式还要在XML中加入`<context:annnotation-config>`标签，或者使用`<context:component-scan/>`；
+4. 实现生命周期的第三种选择是实现InitializingBean和DisposableBean接口。
 
-说明：
+关于`<context:annnotation-config>`和`<context:component-scan/>`标签的区别可以查看下文。
 
-1. 这里使用了`@Service`注解将`PalmSpringJaxObjectFactory`类声明为一个Bean；
-2. 和`@Service`具有相同效果的还有`@Repository`和`@Controller`，他们继承自`@Component`，作用相似，只是针对不同的类的类型（当然也可能被用来根据注解识别类的类型）；
-3. 基于注解的方式中需要指定要扫描的包，这通过使用`<context:component-scan beas-package="..."/>`标签来实现；
-4. 上面也提到过注入值的时候，在基于注解的方式中注入可以使用@Autowired的，而且可以不为指定的字段定义Setter方法；
-5. 对应与`<context:component-scan>`还有一个注解，名为`@ComponentScan`；
-6. 使用@Component注解的时候，如果在其中指定了一个字符串，那么这个字符串是不会作为Bean的名称的，而且也不会将类的首字母变成小写来作为Bean的名称。
-
-### 3.基于java的配置
-
-以下是一个基于Java的配置方式：
-
-	@Configuration
-	public class Config {
-	
-	    @Bean
-	    public BeanA beanA() {
-	    BeanA beanA = new BeanA();
-	    beanA.setB(beanB());
-	    return beanA;
-	    }
-	
-	    @Bean
-	    public BeanB beanB() {
-	    return new BeanB();
-	    }
-	}
-
-1. 这里主要是调用指定的类的构造方法创建对象，并将值赋进去，看起来代码量比使用注解的方式要多；
-
-### 3、其他
-
-#### 1.Bean重写
+### 4.6 Bean重写
 
 当使用多个配置文件定义Bean的时候，如果不同的配置文件中存在相同的名称的Bean就会发生重写，规则是最后加载的Bean会覆盖先加载的Bean.
 
-#### 2.depends-on特性
+## 5、自动装配
 
-在`<bean>`标签内部或者使用@DependsOn注解，表示当前的Bean要在指定的Bean创建完毕之后才被创建。
+### 5.1 基于XML配置的自动装配
 
-#### 3.自动装配
+自动装配就是指由Spring来自动地注入依赖对象，无需人工参与。
 
-可以在`<bean>`内部，通过`autowire`指定自动装配类型，可选的有byName和byType，分别表示根据名称和类型进行装配。也可以在@Bean注解中使用autowired指定装配类型。
+Spring支持`no`、`byName`、`byType`、`constructor`和`default`5种自动装配，默认是`no`指不支持自动装配。
+`byName`表示按照名称装配，`byType`表示按照类型自动装配，`constructor`也是按照类型来装配的，只是用于构造器注入方式。
 
+我们定义如下的FirstBean，它其中有一个SecondBean类型的实例字段，并且有一个Setter方法：
 
-自动装配只适用于Bean类型，值类型可以使用@Value注解来进行赋值。可以在@Value注解中使用占位符和SpEL表达式，并从中获取值。
+```
+public class FirstBean {
+    
+    private SecondBean secondBean;
+    
+    public void setSecondBean(SecondBean secondBean) {
+        this.secondBean = secondBean;
+    }
+}
+```
 
-#### 4.命名Bean
+我们按照如下的方式进行自动装配：
 
-1. 可以在`<bean>`标签中使用id来为指定的Bean定义名称。
-2. 可以通过在`<bean>`标签中使用name来为Bean指定名称，可以指定多个，中间用逗号、空格、分号分开、
-3. 可以使用`<alias>`标签为已经有名字的Bean添加别名。
-4. 可以在@Component注解的子注解中指定Bean的名称，如@Servce("asda")。
-5. 可以在@Bean注解中使用name字段为指定Bean命名，可以在括号中指定多个名称。
+    <bean name="firstBean" class="me.shouheng.spring.autowire.FirstBean" autowire="byName"/>
+    <bean name="secondBean" class="me.shouheng.spring.autowire.SecondBean" />
+	
+测试证明这样的装配是可以成功注入进去的。我们来总结一下自动装配相关的内容：
 
-#### 5.Bean实例化
+1. 不是所有类型都能自动装配，Object、基本数据类型等无法自动装配；
+2. 数组、集合、字典类型的根据类型自动装配和普通类型的自动装配是有区别的，它们需要根据泛型信息注入；
+3. 自动装配的缺点就是没有了配置，在查找注入错误时非常麻烦，还有比如基本类型没法完成自动装配，所以可能经常发生一些莫名其妙的错误；
+4. 自动装配注入和配置注入同时存在时，配置注入的数据会覆盖自动装配注入的数据；
+5. 自动装配要求被装配的Bean中的对象实例有Setter方法。
 
-1. 通过构造方法实例化。
-2. 通过实例或者静态工厂方法实例化。
-3. 可以通过实现FactoryBean<T>接口进行实例化。
+### 5.2 自动扫描
 
-#### 6.Bean作用域
+以上我们定义Bean的时候，对于我们需要用到的每个Bean，我们都要分别使用bean标签进行定义。实际上，我们有更简单的方式来定义Bean。
 
-通过在`<bean>`标签中使用scope指定或者使用@Scope注解：
+如下所示，我们可以使用context命名空间中的`component-scan`来指定要扫描的包，该包下面的使用`@Component`注解生命的类会被当做Bean：
 
-1. singleton：单例的
-2. prototype:每次创建一个实例，类似new操作
-3. request
-4. session
-5. globalSession
+```
+<context:component-scan base-package="me.shouheng.spring.componentscan"/>
+```
 
-#### 7.延迟初始化
+注意，使用以上配置我们需要引用context命名空间，你可以输出前半部分之后由IDEA自动帮你补全该命名空间的定义。
 
-1. 所谓延迟初始化就是在使用到指定Bean的时候才初始化，这是相对于在Spring容器启动阶段就初始化而言的。
-2. 在`<beans>`标签中通过制定default-lazy-init="true"可以将内部全部bean延迟初始化；
-3. 在`<bean>`标签中也可以指定某个Bean是否延迟初始化，在bean中定义的会覆盖在beans中定义的；
-4. 可以使用@Lazy注解在代码中实现延迟初始化；
-5. 延迟初始化的好处是加快了容器的启动时间，占用较少内存。缺点是若在元数据中存在Bean配置错误，在对方案测试之前无法被发现；
-6. 如果一个依赖Bean被定义为预先初始化，那么延迟定义将没有作用。
+当然，同样的功能你还可以通过使用基于类的配置方式实现：
 
-#### 8.生命周期回调
+```
+@Configurable
+@ComponentScan(value = "me.shouheng.spring.componentscan")
+public class ComponentScanConfiguration { }
+```
 
-1. 在`<bean>`标签中通过`init-method`和`destroy-method`指定某个函数为初始化方法和销毁方法。Bean创建完毕之后，init方法被调用；Bean生命周期结束之前会调用destroy方法。
-2. 被指定的方法的方法名没有限制；
-3. 可以使用@PostConstruct和@PreDestroy注解标记指定的方法来实现生命周期回调，要使用这种方式还要在XML中加入`<context:annnotation-config>`标签；
-4. 实现生命周期的第三种选择是实现InitializingBean和DisposableBean接口。
+这里我们用`@Configurable`将其声明为一个配置类，然后使用`@ComponentScan`注解指定要扫描的包路径。然后，我们通过如下的方式来获取一个上下文：
 
-#### 9.Bean定义配置文件
+```
+AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ComponentScanConfiguration.class);
+```
 
-#### 10.环境
+对基于以上配置方式做简单总结：
 
-### 4、实例
+1. 和`@Component`具有相似功能的还有`@Service`、`@Repository`和`@Controller`，只是针对不同的类的类型，后面三个继承自前者；
+2. 自动装配可以通过为字段添加`@Autowired`注解来实现，也可以不指定注解，但是要给字段提供Setter方法和构造方法；
+3. 可以通过`@Component`注解的`value`字段为Bean指定一个名称，默认将首字母小写之后作为Bean的名字；
+4. 可以通过`@ComponentScan`注解的`basePackages`来指定多个扫描的包；
+5. `@Autowired`注解有一个`required`的布尔类型字段，默认为true，表示如果找不到可装配的Bean就抛异常；
+将其设置为false时，如果找不到也不会抛异常，但是如果最终没有注入值，又恰好用到了它，可能会在运行时抛出NPE异常。
 
-#### 1.bean标签中的parent
+### 5.3 基于Java的自动装配机制
 
-    <bean id="securityContextInterceptor" abstract="true"
-      class="com.oo.ejb3.interceptor.SecurityContextInterceptor">
-    <property name="loginHistoryService" ref="loginHistoryService"/>
-    <property name="sysAutoUpdateDAO" ref="sysAutoUpdateDAOImpl"/>
-    </bean>
+我们在上面使用了`@Configurable`注解和AnnotationConfigApplicationContext来配置和获取上下文，并使用`@ComponentScan`注解指定要扫描的包路径。
 
-    <bean parent="securityContextInterceptor">
-    <property name="businessInterface"
-          value="com.oo.ejb3.system.sessionbean.WSUserService"/>
-    <property name="target" ref="userService"/>
-    </bean>
+使用以上注解和上下文，我们也可以直接在Java代码中实现装配和注入。
 
-有时候，我们会遇到像上面这种情况——在bean标签中使用了parent。这里和模板设计模式（或者策略）的理念相似，即使用parent指定的那个bean是一个模板的基类，在子类中我们会按照子类的要求为其中的字段赋不同的值，来得到一个新的Bean。
+```
+@Configuration
+public class JavaConfig {
 
-在被指定为parent的bean上面使用了abstract="true"，它指示该bean不被预先实例化。注意这并不要求该bean标签中的calss指定的类是抽象的。
+    @Bean("first")
+    public FirstBean firstBean() {
+        return new FirstBean(secondBean());
+    }
 
-一个子bean定义可以从父bean继承构造器参数值、属性值以及覆盖父bean的方法，并且可以有选择地增加新的值。如果指定了init-method，destroy-method和/或静态factory-method，它们就会覆盖父bean相应的设置。
+    @Bean("second")
+    public SecondBean secondBean() {
+        return new SecondBean();
+    }
+}
+```
+
+以上时基于Java自动装配的机制，显然如果我们需要定义某个Bean，就要在这里单个地进行声明。你可以把`@ComponentScan`注解当作这种配置方式的一个便捷功能。
+
+## 6、混合使用多种配置方式
+
+以上提供了基于Java和基于XML的两种配置方式，实际上我们可以混合使用多种不同类型的配置方式。这里我们简单列举一下好了：
+
+1. 在XML中引用基于XML配置：`<import resource="AspectConfig.xml "/>`
+2. 在XML中应用基于Java的配置：`<bean class="me.shouheng.spring.javaconfig.JavaConfig"/>`，没错就是将配置类当作Bean引入；
+3. 在基于Java的配置中引用基于Java的配置：`@Import(value = {JavaConfig.class})`
+4. 在基于Java的配置中引用基于XML的配置：`@ImportResource(value = {"classpath:aop/AOPConfig.xml"})`
+
+## 问题整理：
+
+### 1、`<context:annnotation-config>`和`<context:component-scan/>`标签的区别
+
+如果用`<context:annotation-config/>`，我们还需要配置Xml注册Bean，而使用`<context:component-scan />`的话，注册的步骤都免了。
+当然前提是我们对需要扫描的类使用的注解（比如@Componet,@Service），而如果同时使用两个配置的话，`<context:annotation-config/>`会被忽略掉。
+
+就是说`<context:component-scan/>`的功能是包含`<context:annnotation-config>`的，前者不仅可以使用注解配置，还可以扫描自动包下面的Bean。
