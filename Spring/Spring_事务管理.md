@@ -346,3 +346,154 @@ public class TXTest2 {
 上面的测试即调用了我们的业务层的方法，根据实际的测试结果确实可以对事务进行正确的管理。
 这里还要注意一下，我们向TXTest2中注入TXTestService的时候使用的是`txTestServiceProxy`，也就是用代理增强之后的Service。
 而且这里的Service必须定义成接口，才能成功地将代理之后的值注入进去。
+
+#### 3.2.2 基于AspectJ的XML事务管理方式
+
+除了使用上面的代理方式，我们还可以使用基于AspectJ的XML事务管理方式。我们需要做以下配置：
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:tx/dbcp.properties" />
+
+    <!-- 使用dbcp作为数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="root" />
+        <property name="password" value="${password}" />
+    </bean>
+
+    <!--事务管理模型-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--定义DAO-->
+    <bean id="txDAO" class="me.shouheng.spring.tx.dao.TXDAOImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--定义Service-->
+    <bean id="txTestService" class="me.shouheng.spring.tx.service.TXTestServiceImpl"/>
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" isolation="DEFAULT"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:pointcut id="pt" expression="execution(* me.shouheng.spring.tx.service.TXTestService+.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt"/>
+    </aop:config>
+
+</beans>
+```
+
+在XML中我们需要定义一个通知，然后定义AOP并且指定切点。这里我们在定义通知的时候，引用了之前定义的事务管理器，并且在`<tx:attributes>`标签中指定了事务的属性。
+在它的子标签中我们指定了对别管理的任意方法(由`*`指定)使用的传播行为(REQUIRED)和隔离级别(DEFAULT)。
+
+使用这种配置方式大部分的工作都在这里配置即可。注意一下我们定义的切点是接口TXTestService的字类的所有方法，也就是说其中的任意方法都会使用事务进行管理。
+这样我们就可以直接使用`txTestService`这个Bean来访问了，因为它的每个方法都被Spring的事务接管了。
+
+所以，我们可以直接在Test中进行如下的测试：
+
+```
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:tx/TxConfig3.xml")
+public class TXTest3 {
+
+    @Resource(name = "txTestService")
+    private TXTestService txTestService;
+
+    @Test
+    public void test() {
+        txTestService.updateMoney();
+    }
+}
+
+```
+
+显然，这里我们将`txTestService`这个Bean注入到了测试环境中，并调用了它的`updateMoney()`方法。在该方法中抛出了异常，所以整个方法的逻辑都会在出现异常的时候被回滚。
+
+#### 3.2.3 Spring的基于注解的事务管理
+
+使用这种方式的配置更加简单，我们只需要做如下的配置即可：
+
+首先在XML配置文件中，我们启用事务的注解驱动，并且指定事务管理器
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:tx/dbcp.properties" />
+
+    <!-- 使用dbcp作为数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="root" />
+        <property name="password" value="${password}" />
+    </bean>
+
+    <!--事务管理模型-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--定义DAO-->
+    <bean id="txDAO" class="me.shouheng.spring.tx.dao.TXDAOImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--定义Service-->
+    <bean id="txTestService" class="me.shouheng.spring.tx.service.TXTestServiceImpl"/>
+
+	<!--使用事务的注解驱动，并且指定事务管理器-->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+</beans>
+```
+
+然后我们在需要使用事务管理的业务层类上面加上@Transactional注解即可：
+
+```
+@Transactional
+public class TXTestServiceImpl implements TXTestService {
+
+    @Autowired
+    private TXDAO txdao;
+
+    @Override
+    public void updateMoney() {
+        txdao.addMoney();
+        int x = 1 / 0;
+        txdao.minusMoney();
+    }
+}
+```
+
+你可以查看一下该注解的定义，其中有用来定义事务的隔离级别和传播行为等的字段。你可以使用它们来定义事务的行为。
+
+接下来就是测试代码，和之前的例子的测试是一样的，只要将使用的配置文件换成我们上面定义的配置文件即可。
+
+## 总结：
+
+好了，上面就是Spring的事务管理相关的知识和使用的基本方法。要掌握Spring的事务管理不仅需要Spring的知识，同时还需要一些数据库方面的知识。
+
+在Spring中使用事务有编程式和声明式两种方式，通常倾向于使用声明式的事务管理，因为它的代码更加简单，对代码的侵入量比较小
+
