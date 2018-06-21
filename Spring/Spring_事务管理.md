@@ -495,5 +495,13 @@ public class TXTestServiceImpl implements TXTestService {
 
 好了，上面就是Spring的事务管理相关的知识和使用的基本方法。要掌握Spring的事务管理不仅需要Spring的知识，同时还需要一些数据库方面的知识。
 
-在Spring中使用事务有编程式和声明式两种方式，通常倾向于使用声明式的事务管理，因为它的代码更加简单，对代码的侵入量比较小
+在Spring中使用事务有编程式和声明式两种方式，通常倾向于使用声明式的事务管理，因为它的代码更加简单，对代码的侵入量比较小。
+
+Spring事务管理：
+
+1. 编程式事务管理：很少使用
+2. 声明式事务管理：
+    1. 基于TransactionProxyFactoryBean的方式：很少使用，需要为每个管理类配置一个TransactionProxyFactoryBean进行增强
+	2. 基于AspectJ的XML事务管理方式：经常使用，一旦配置号就不需要添加任何东西
+	3. 基于注解进行事务管理：经处死用，配置简单，需要在业务层的类上面添加一个@Transactional注解。
 
