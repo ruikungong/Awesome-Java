@@ -1,4 +1,27 @@
-## 2.Spring MVC
+# Spring MVC
+
+## 1、Web MVC
+
+在Web开发中，通常是浏览器发送请求到服务器，由服务器接收请求并将响应传递给客户端，并由客户端渲染之后展示给用户。因此，一般服务器是无法主动通知客户端更新内容的，虽然有些推送技术可以实现主动通知客户端。
+
+在标准的MVC里，服务器是可以主动将数据推送给客户端的，但是实际的WebMVC是做不到的，如果用户想要视图更新，需要再发送一次请求。
+
+Web端的开发经历了从**CGI->Servlet->JSP->Model1->Model2->Front Controller+PageController**的过程：
+
+- **CGI**：(Common Gateway Interface)公共网关接口，用于接收web用户请求并处理，最后动态产生响应给用户，但每次请求将产生一个进程，重量级。
+- **Servlet**：接收web用户请求并处理，最后动态产生响应给用户。但每次请求只产生一个线程（而且有线程池），轻量级。本质就是在java代码里面 输出 html流。
+- **JSP**：运行在标准的HTML页面中嵌入脚本语言，本质就是在html代码中嵌入java代码。JSP最终还是会被编译为Servlet。
+- **Model1**：JSP的增强版，可以认为是jsp+javabean，使用<jsp:useBean>标准动作简化javabean的获取/创建，及将请求参数封装到javabean。
+- **Model2**：Web MVC模型，只是控制器采用Servlet、模型采用JavaBean、视图采用JSP。
+- **Front Controller+PageController**：即前端控制器+应用控制器+页面控制器（也有称其为动作）+上下文，也是Web MVC，只是责任更加明确。
+
+
+
+
+
+
+
+
 
 ### 1.基本原理
 
