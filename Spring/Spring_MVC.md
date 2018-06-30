@@ -1,6 +1,8 @@
 # Spring MVC
 
-## 1、Web MVC
+## 1、简介
+
+### 1.1 Web MVC
 
 在Web开发中，通常是浏览器发送请求到服务器，由服务器接收请求并将响应传递给客户端，并由客户端渲染之后展示给用户。因此，一般服务器是无法主动通知客户端更新内容的，虽然有些推送技术可以实现主动通知客户端。
 
@@ -14,6 +16,146 @@ Web端的开发经历了从**CGI->Servlet->JSP->Model1->Model2->Front Controller
 - **Model1**：JSP的增强版，可以认为是jsp+javabean，使用<jsp:useBean>标准动作简化javabean的获取/创建，及将请求参数封装到javabean。
 - **Model2**：Web MVC模型，只是控制器采用Servlet、模型采用JavaBean、视图采用JSP。
 - **Front Controller+PageController**：即前端控制器+应用控制器+页面控制器（也有称其为动作）+上下文，也是Web MVC，只是责任更加明确。
+
+### 1.2 Spring MVC
+
+Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的配置方式。以下是Spring Web MVC处理请求的流程：
+
+![Spring Web MVC处理请求的流程](res/spring_mvc_concept.JPG)
+
+从上面的图中，我们总结Spring MVC的请求处理流程。当用户发送请求之后：
+
+1. 用户请求达到**前端控制器**，前端控制器根据URL找到处理请求的**控制器**，并把请求委托给它；
+2. 控制器收到请求之后会调用**业务处理对象**对其进行处理，并对得到的数据模型进行处理从而得到**ModelAndView**，并将其返回给前端控制器；
+3. 前端控制器根据返回的视图名选择相应的视图进行渲染，并把最终的响应返回给用户。
+
+结合Spring MVC框架中具体的类，我们又可以得到下面的这张更加详尽的图：
+
+![Spring Web MVC架构](res/spring_mvc_framework.JPG)
+
+在SpringMVC中的核心的类是`DispatcherServlet`，根据上面的分析，它可以算的上是中间调度的桥梁。我们引入Spring MVC的依赖之后看下相关的代码。
+在`DispatcherServlet`中核心的方法是`doDispatch()`，下面是它的代码：
+
+    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HttpServletRequest processedRequest = request;
+        HandlerExecutionChain mappedHandler = null;
+        boolean multipartRequestParsed = false;
+        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+
+        try {
+            try {
+                ModelAndView mv = null;
+                Object dispatchException = null;
+
+                try {
+				    // 1.首先查看是否是Multipart，即是否包含要上传的文件
+                    processedRequest = this.checkMultipart(request);
+                    multipartRequestParsed = processedRequest != request;
+					// 2.根据请求和handlerMappings(列表)，找到对应的HandlerExecutionChain
+                    mappedHandler = this.getHandler(processedRequest);
+                    if (mappedHandler == null || mappedHandler.getHandler() == null) {
+                        this.noHandlerFound(processedRequest, response);
+                        return;
+                    }
+
+					// 3.同样的方式，从一个HandlerAdapter的列表中获取到对应的HandlerAdapter
+                    HandlerAdapter ha = this.getHandlerAdapter(mappedHandler.getHandler());
+                    String method = request.getMethod();
+                    boolean isGet = "GET".equals(method);
+                    if (isGet || "HEAD".equals(method)) {
+                        long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
+                        if (this.logger.isDebugEnabled()) {
+                            this.logger.debug("Last-Modified value for [" + getRequestUri(request) + "] is: " + lastModified);
+                        }
+
+                        if ((new ServletWebRequest(request, response)).checkNotModified(lastModified) && isGet) {
+                            return;
+                        }
+                    }
+
+					// 4.执行处理器相关的拦截器的预处理
+                    if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+                        return;
+                    }
+
+					// 5.由适配器执行处理器（调用处理器相应功能处理方法），注意返回了ModelAndView
+                    mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+                    if (asyncManager.isConcurrentHandlingStarted()) {
+                        return;
+                    }
+
+                    this.applyDefaultViewName(processedRequest, mv);
+					// 6.执行处理器相关的拦截器的后处理
+                    mappedHandler.applyPostHandle(processedRequest, response, mv);
+                } catch (Exception var20) {
+                    dispatchException = var20;
+                } catch (Throwable var21) {
+                    dispatchException = new NestedServletException("Handler dispatch failed", var21);
+                }
+				
+				// 7.处理分发结果，其中包含了一部分异常处理，也包括根据视图名称获取视图解析器并进行渲染等等
+                this.processDispatchResult(processedRequest, response, mappedHandler, mv, (Exception)dispatchException);
+            } catch (Exception var22) {
+                this.triggerAfterCompletion(processedRequest, response, mappedHandler, var22);
+            } catch (Throwable var23) {
+                this.triggerAfterCompletion(processedRequest, response, mappedHandler, new NestedServletException("Handler processing failed", var23));
+            }
+        } finally {
+            if (asyncManager.isConcurrentHandlingStarted()) {
+                if (mappedHandler != null) {
+                    mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
+                }
+            } else if (multipartRequestParsed) {
+			    // 清理multipart请求占用的资源
+                this.cleanupMultipart(processedRequest);
+            }
+        }
+    }
+
+	// 该方法用来处理从处理器拿到的结果，不论是异常还是得到的ModelAndView都会被处理
+    private void processDispatchResult(HttpServletRequest request, HttpServletResponse response,
+            HandlerExecutionChain mappedHandler, ModelAndView mv, Exception exception) throws Exception {
+        boolean errorView = false;
+		
+		// 处理异常信息
+        if (exception != null) {
+            if (exception instanceof ModelAndViewDefiningException) {
+                this.logger.debug("ModelAndViewDefiningException encountered", exception);
+                mv = ((ModelAndViewDefiningException)exception).getModelAndView();
+            } else {
+                Object handler = mappedHandler != null ? mappedHandler.getHandler() : null;
+                mv = this.processHandlerException(request, response, handler, exception);
+                errorView = mv != null;
+            }
+        }
+
+		// 解析视图并进行视图的渲染 
+        if (mv != null && !mv.wasCleared()) {
+		    // 实际的渲染方法，会根据ModelAndView的名称找到对应的视图解析器，并渲染得到一个视图View
+            this.render(mv, request, response);
+            if (errorView) {
+                WebUtils.clearErrorRequestAttributes(request);
+            }
+        } else if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Null ModelAndView returned to DispatcherServlet with name '" + this.getServletName() + "': assuming HandlerAdapter completed request handling");
+        }
+
+        if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
+            if (mappedHandler != null) {
+                mappedHandler.triggerAfterCompletion(request, response, (Exception)null);
+            }
+        }
+    }
+
+所以，我们可以总结Spriung MVC的工作原理如下：
+
+1. 用户发送的请求首先会到达`DispatcherServlet`，并由它进行处理；
+2. `DispatcherServlet`先通过`HandlerMapping`找到该请求对应的`HandlerExecutionChain`（包含一个`Handler`处理器、多个`HandlerInterceptor`拦截器），通过这种策略模式，很容易添加新的映射策略；
+3. 然后`DispatcherServlet`继续将请求发送给`HandlerAdapter`，`HandlerAdapter`会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式，从而很容易支持很多类型的处理器；
+4. `HandlerAdapter`将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理；并返回一个`ModelAndView`对象（包含模型数据、逻辑视图名）；
+5. 再由`DispatcherServlet`根据`ModelAndView`找到对应的ViewResolver，并由它把逻辑视图名解析为具体的View，通过这种策略模式，很容易更换其他视图技术；
+6. 接下来会对`View`进行渲染，`View`会根据传进来的`Model`模型数据进行渲染，Model实际是一个Map数据结构，因此很容易支持其他视图技术；
+7. 返回控制权给`DispatcherServlet`，由`DispatcherServlet`返回响应给用户，到此一个流程结束。
 
 
 
