@@ -48,17 +48,17 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
                 Object dispatchException = null;
 
                 try {
-				    // 1.首先查看是否是Multipart，即是否包含要上传的文件
+                    // 1.首先查看是否是Multipart，即是否包含要上传的文件
                     processedRequest = this.checkMultipart(request);
                     multipartRequestParsed = processedRequest != request;
-					// 2.根据请求和handlerMappings(列表)，找到对应的HandlerExecutionChain
+                    // 2.根据请求和handlerMappings(列表)，找到对应的HandlerExecutionChain
                     mappedHandler = this.getHandler(processedRequest);
                     if (mappedHandler == null || mappedHandler.getHandler() == null) {
                         this.noHandlerFound(processedRequest, response);
                         return;
                     }
 
-					// 3.同样的方式，从一个HandlerAdapter的列表中获取到对应的HandlerAdapter
+                    // 3.同样的方式，从一个HandlerAdapter的列表中获取到对应的HandlerAdapter
                     HandlerAdapter ha = this.getHandlerAdapter(mappedHandler.getHandler());
                     String method = request.getMethod();
                     boolean isGet = "GET".equals(method);
@@ -73,19 +73,19 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
                         }
                     }
 
-					// 4.执行处理器相关的拦截器的预处理
+                    // 4.执行处理器相关的拦截器的预处理
                     if (!mappedHandler.applyPreHandle(processedRequest, response)) {
                         return;
                     }
 
-					// 5.由适配器执行处理器（调用处理器相应功能处理方法），注意返回了ModelAndView
+                    // 5.由适配器执行处理器（调用处理器相应功能处理方法），注意返回了ModelAndView
                     mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
                     if (asyncManager.isConcurrentHandlingStarted()) {
                         return;
                     }
 
                     this.applyDefaultViewName(processedRequest, mv);
-					// 6.执行处理器相关的拦截器的后处理
+                    // 6.执行处理器相关的拦截器的后处理
                     mappedHandler.applyPostHandle(processedRequest, response, mv);
                 } catch (Exception var20) {
                     dispatchException = var20;
@@ -93,7 +93,7 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
                     dispatchException = new NestedServletException("Handler dispatch failed", var21);
                 }
 				
-				// 7.处理分发结果，其中包含了一部分异常处理，也包括根据视图名称获取视图解析器并进行渲染等等
+                // 7.处理分发结果，其中包含了一部分异常处理，也包括根据视图名称获取视图解析器并进行渲染等等
                 this.processDispatchResult(processedRequest, response, mappedHandler, mv, (Exception)dispatchException);
             } catch (Exception var22) {
                 this.triggerAfterCompletion(processedRequest, response, mappedHandler, var22);
@@ -106,18 +106,18 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
                     mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
                 }
             } else if (multipartRequestParsed) {
-			    // 清理multipart请求占用的资源
+                // 清理multipart请求占用的资源
                 this.cleanupMultipart(processedRequest);
             }
         }
     }
 
-	// 该方法用来处理从处理器拿到的结果，不论是异常还是得到的ModelAndView都会被处理
+    // 该方法用来处理从处理器拿到的结果，不论是异常还是得到的ModelAndView都会被处理
     private void processDispatchResult(HttpServletRequest request, HttpServletResponse response,
             HandlerExecutionChain mappedHandler, ModelAndView mv, Exception exception) throws Exception {
         boolean errorView = false;
 		
-		// 处理异常信息
+        // 处理异常信息
         if (exception != null) {
             if (exception instanceof ModelAndViewDefiningException) {
                 this.logger.debug("ModelAndViewDefiningException encountered", exception);
@@ -129,9 +129,9 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
             }
         }
 
-		// 解析视图并进行视图的渲染 
+        // 解析视图并进行视图的渲染 
         if (mv != null && !mv.wasCleared()) {
-		    // 实际的渲染方法，会根据ModelAndView的名称找到对应的视图解析器，并渲染得到一个视图View
+            // 实际的渲染方法，会根据ModelAndView的名称找到对应的视图解析器，并渲染得到一个视图View
             this.render(mv, request, response);
             if (errorView) {
                 WebUtils.clearErrorRequestAttributes(request);
@@ -152,49 +152,56 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
 1. 用户发送的请求首先会到达`DispatcherServlet`，并由它进行处理；
 2. `DispatcherServlet`先通过`HandlerMapping`找到该请求对应的`HandlerExecutionChain`（包含一个`Handler`处理器、多个`HandlerInterceptor`拦截器），通过这种策略模式，很容易添加新的映射策略；
 3. 然后`DispatcherServlet`继续将请求发送给`HandlerAdapter`，`HandlerAdapter`会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式，从而很容易支持很多类型的处理器；
-4. `HandlerAdapter`将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理；并返回一个`ModelAndView`对象（包含模型数据、逻辑视图名）；
-5. 再由`DispatcherServlet`根据`ModelAndView`找到对应的ViewResolver，并由它把逻辑视图名解析为具体的View，通过这种策略模式，很容易更换其他视图技术；
+4. `HandlerAdapter`将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理，并返回一个`ModelAndView`对象（包含模型数据、逻辑视图名）；
+5. 再由`DispatcherServlet`根据`ModelAndView`找到对应的`ViewResolver`，并由它把逻辑视图名解析为具体的`View`，通过这种策略模式，很容易更换其他视图技术；
 6. 接下来会对`View`进行渲染，`View`会根据传进来的`Model`模型数据进行渲染，Model实际是一个Map数据结构，因此很容易支持其他视图技术；
 7. 返回控制权给`DispatcherServlet`，由`DispatcherServlet`返回响应给用户，到此一个流程结束。
 
+## 2、使用Spring MVC
 
+### 2.1 Spring MVC基于XML的配置方式
 
+首先，要使用Spring MVC需要加入相关的依赖：
 
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
 
+我们上面分析过的`DispatcherServlet`是注册到web.xml里面的，我们需要加入如下的配置：
 
+	<!DOCTYPE web-app PUBLIC
+			"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+			"http://java.sun.com/dtd/web-app_2_3.dtd" >
+	<web-app>
+		<display-name>Archetype Created Web Application</display-name>
 
+		<servlet>
+			<servlet-name>spring_is_coming</servlet-name>
+			<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+			<load-on-startup>1</load-on-startup>
+		</servlet>
+		<servlet-mapping>
+			<servlet-name>spring_is_coming</servlet-name>
+			<url-pattern>*.mvc</url-pattern>
+		</servlet-mapping>
+	</web-app>
 
+这里我们注册了一个`servlet`，即上面提到的`DispatcherServlet`，并为其指定一个名称为`spring_is_coming`。对应的，我们还要为其指定一个`servlet-mapping`。
+如上所示，我们在`url-pattern`中指定了该servlet要处理的url的模式，即所有以`*.mvc`结尾的url。load-on-startup表示启动容器时初始化该Servlet。
 
-### 1.基本原理
+默认情况下，`DispatcherServlet`会加载`WEB-INF/[DispatcherServlet的Servlet名字]-servlet.xml`下面的配置文件。根据上面的配置我们需要在当前项目的`WEB-INF`目录下面加入`spring_is_coming-servlet.xml`文件。并在该文件中加入如下的代码：
 
-#### 1.Spring MVC的处理请求的流程：
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       xmlns:p="http://www.springframework.org/schema/p">
 
-![](http://sishuok.com/forum/upload/2012/7/14/529024df9d2b0d1e62d8054a86d866c9__1.JPG)
-
-#### 2.Spring Web MVC架构
-
-![](http://sishuok.com/forum/upload/2012/7/14/57ea9e7edeebd5ee2ec0cf27313c5fb6__2.JPG)
-
-### 2.Hello实例
-
-在web.xml中加入以下内容来注册DispatcherServlet：
-
-    <servlet>
-        <servlet-name>springmvc</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>springmvc</servlet-name>
-        <url-pattern>*.mvc</url-pattern>
-    </servlet-mapping>
-
-注意：
-
-1. 这里`url-pattern`标签定义了url的匹配模式，即所有以`.mvc`结尾的请求会被MVC处理；
-
-在springmvc-servlet中加入以下内容。
-
+    <!-- HandlerMapping -->
     <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
 
     <!-- HandlerAdapter -->
@@ -207,42 +214,135 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <bean name="/hello.mvc" class="my.shouheng.mvc.HelloController"/>
+    <bean name="/hello.mvc" class="me.shouheng.spring.mvc.HelloController"/>
 
-注意：
+</beans>
+```
 
-1. 这里的servlet配置文件的命名规则是，在web.xml中定义的servlet-name的后面加上`-servlet.xml`。如果采用其他的Servlet名称，也必须在后面加入`-servlet.xml`。
-2. `InternalResourceViewResolver`定义了jsp文件的前缀和后缀路径，查找jsp文件的时候会到指定的前缀路径中查找指定后缀的文件；
-3. 这里定义了bean，它的name就是url路径的匹配模式，也就是`hello.mvc`结尾的请求会被HelloController处理。
-4. BeanNameUrlHandlerMapping的映射规则是，将Bean的name与url映射，比如这里的url为`/hello.mvc`，那么就必须有一个对应的name为`/hello.mvc`的Bean。
-5. SimpleControllerHandlerAdapter表示所有实现了`Controller`接口的Bean可以作为Spring Web MVC中的处理器。如果需要其他类型的处理器可以通过实现HadlerAdapter来解决。
-6. HandlerMapping是用来将url映射到指定的Handler的（策略模式），而HandlerAdapter是用来对指定的Handler进行适配，以支持多种Handler（适配器模式）。这样DispatcherServlet就可以将指定的url调用指定的Handler进行处理。
+这里我们声明了几个Bean，即HandlerMapping和HandlerAdapter的默认实现。然后，我们还定义了一个视图解析器`InternalResourceViewResolver`。
+它是一个默认的视图解析器，在它的属性配置中，我们指定了加载的文件的前缀和后缀路径。实际上，当我们指定某个视图名字为hello，那么该视图解析器就会加载文件
+`/WEB-INF/jsp/hello.jsp`。
 
-定义如下控制器：
+接下来我们定义了一个控制器，该控制器的名字对应于指定的url。因为之前我们使用了Bean的映射规则是`BeanNameUrlHandlerMapping`，也就是说Bean的名称和url对应。
 
-	public class HelloController implements Controller {
-	
-	    public ModelAndView handleRequest(HttpServletRequest httpServletRequest, javax.servlet.http.HttpServletResponse httpServletResponse) throws Exception {
-	        ModelAndView mv = new ModelAndView();
-	        //添加模型数据 可以是任意的POJO对象
-	        mv.addObject("message", "Hello World!");
-	        //设置逻辑视图名，视图解析器会根据该名字解析到具体的视图页面
-	        mv.setViewName("hello");
-	        return mv;
-	    }
-	}
+然后就是上面定义的那个控制器的代码：
 
-注意：
+```
+public class HelloController implements Controller {
 
-1. 这里通过setViewName方法指定jsp的名称，这里会到/WEB-INF/jsp/中查找hello.jsp
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        // 添加模型数据 可以是任意的POJO对象
+        mv.addObject("message", "Hello Spring MVC!");
+        // 设置逻辑视图名，视图解析器会根据该名字解析到具体的视图页面
+        mv.setViewName("hello");
+        return mv;
+    }
+}
+```
 
-**回顾一下以上程序的整个执行过程：**
+这里我们用了`ModelAndView.setViewName()`为该ModelAndView指定了对应的jsp文件的名称，会按照我们上面配置的视图解析的规则到指定目录下记载指定名称的文件。
 
-![](http://sishuok.com/forum/upload/2012/7/14/8b42eeaa9b2423b154944c651ed23667__3.JPG)
+启动服务器，在浏览器中输入地址：http://localhost:8080/hello.mvc，进行测试即可。
 
-首先用户请求会传递到DispatcherServlet（前段控制器），它接收所有以*.mvc结尾的请求。然后，它根据BeanNameUriHandlerMapping将指定的url，即/hello.mvc，映射到HelloWorldController。然后，DispatcherServlet再将HelloWorldController传递给SimpleControllerHandlerAdapter，它作为一个适配器，在这里真正调用HelloWorldController的方法执行业务逻辑。执行完毕业务逻辑之后，将结果ModelAndView传递到DispatcherServler。这时DispatcherServler再将ModelAndView传递给视图解析InternalResourceViewResolver，后者根据setViewName时赋值的名称，得到JstlView对象。然后，DispatcherServler对视图进行渲染，得到渲染结果之后返回给用户。
+### 2.2 使用过滤器
 
-可见，其实这里的HandlerMapping和HandlerAdapter和ViewResolver是可以通过配置来指定不同的实现策略的。这里就像是模板、策略和适配器设计模式的组合，将一些可以由用户定制的处理逻辑交给我们来实现，而整个处理流程由SpringMVC进行控制。
+我们还可以在分发器处理请求之前对其进行处理，我们通过过滤器来实现。我们可以用过滤器来做一些基础的工作，比如字符串编码之类的问题。下面我们通过一个自定义的简单的例子来演示一下过滤器的使用：
+
+首先，我们自定义一个简单的过滤器，并在其中输出一些信息到控制台上：
+
+```
+public class TheFilter implements Filter {
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("init, filterConfig" + filterConfig);
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        System.out.println("==================================== doFilter, servletRequest: "
+                + servletRequest
+                + "\nservletResponse: "
+                + servletResponse
+                + "\nfilterChain: " + filterChain);
+        // 必须调用这个方法，否则请求就要在这里被拦截了
+        filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("destroy");
+    }
+}
+```
+
+这里我们要实现Fileter接口的三个与声明周期相关的方法。然后，将其配置到web.xml中就可以了：
+
+
+    <filter>
+        <filter-name>the_filter</filter-name>
+        <filter-class>me.shouheng.spring.mvc.TheFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>the_filter</filter-name>
+        <url-pattern>*.mvc</url-pattern>
+    </filter-mapping>
+
+这样我们就可以对所有以`*.mvc`结尾的请求进行处理了。
+
+### 2.3 DispatcherServlet详解
+
+**实际上DispatcherServlet是Servlet的一种，也就是当我们使用Spring MVC的时候需要配置该类，因为它是Spring MVC的核心配置类。而当我们不打算使用Spring MVC而想要为其他客户端提供接口的时候就需要配置其他类型的Servlet，不过它们的配置和在Servlet种被使用的原理都是一样的。**。
+
+上面我们已经提到过了`DispatcherServlet`的两个参数的意义，并且使用了配置文件`spring_is_coming-servlet.xml`。而实际上为`DispatcherServlet`指定配置文件的方式可以有多种：
+
+第一种，默认会使用`[DispatcherServlet的Servlet名字]-servlet.xml`这种命名规则到`WEB-INF`目录下面加载该文件，这也是我们上面使用的方式。
+
+第二种方式是在配置servlet的时候，在`<servlet>`标签中使用`contextClass`，并且指定一个配置类，该配置类需要实现`WebApplicationContext`接口的类。如果这个参数没有指定， 默认使用`XmlWebApplicationContext`。
+
+第三种方式是与第二种类似，都是在配置servlet的时候指定，不过这里使用的是`contextConfigLocation`，并用字符串来指定上下文的位置。这个字符串可以被分成多个字符串（使用逗号作为分隔符） 来支持多个上下文（在多上下文的情况下，如果同一个bean被定义两次，后面一个优先）。如下所示：
+
+   <servlet>
+        <servlet-name>chapter2</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-servlet-config.xml</param-value>
+        </init-param>
+    </servlet>
+
+通常在我们配置上下文的时候会指定多个上下文，各个上下文也有自己的职责范围。除了之前我们配置的Servlet的上下文，在使用Spring的时候，我们还需要配置整个应用的上下文：
+
+```
+<context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+         classpath:spring-common-config.xml,
+         classpath:spring-budget-config.xml
+    </param-value>
+</context-param>
+<listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+```
+
+这里配置的就是整个应用的上下文，配置的`ContextLoaderListener`会在容器启动的时候自动初始化应用程序上下文。而该应用程序上下文的配置文件就由上面的`context-param`来指定。应用程序上下文通常用来加载整个程序的基础类，比如DAO层和Service层等。这样它们就可以与任何其他的Web层配合使用。而Servlet配置的上下文通常用来加载Web层需要的类，比如Controller、HandlerMapping、HandlerAdapter等等。
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 3.使用注解定义SpringMVC
 
@@ -281,6 +381,7 @@ Spring MVC与Spring搭配可以为我们提供强大的功能，更加简洁的�
 这里的@RequstMapping也可以被用在类上面，还可以指定多个映射路径，比如@RequestMapping({"/", "/homepage"})
 
 #### 2.接受请求的输入
+
 
 1.通过路径参数接受输入：
 
