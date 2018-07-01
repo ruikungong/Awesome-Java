@@ -437,7 +437,7 @@ public class HelloController3 {
 
     <bean class="me.shouheng.spring.mvc.HelloController3"/>
 
-这样基本的配置方式就已经完成了。然后，运行Web容器并输入url:http://localhost:8080/hello3即可。还要注意下，还要修改web.xml中的Servlet的匹配路径，如果是`*.mvc`的话要改成`/`。
+这样基本的配置方式就已经完成了。然后，运行Web容器并输入`url:http://localhost:8080/hello3`即可。还要注意下，还要修改web.xml中的Servlet的匹配路径，如果是`*.mvc`的话要改成`/`。
 
 其实这里的配置方式和之前的配置方式唯一的区别也就在于，将映射的规则从之前的**Bean名到url**转换成了**注解到url**。
 
@@ -462,26 +462,19 @@ public class HelloController3 {
 
 按照上面的方式，将会匹配到：/user/hello3。
 
+### 2.6 RequestMapping注解
+
 从上面看出使用注解的配置方式中，核心的配置应该属于`@RequestMapping`注解。下面是该注解的定义：
 
 ```
 public @interface RequestMapping {
     String name() default "";
-
-    @AliasFor("path")
-    String[] value() default {};
-
-    @AliasFor("value")
-    String[] path() default {};
-
+    @AliasFor("path") String[] value() default {};
+    @AliasFor("value") String[] path() default {};
     RequestMethod[] method() default {};
-
     String[] params() default {};
-
     String[] headers() default {};
-
     String[] consumes() default {};
-
     String[] produces() default {};
 }
 ```
@@ -498,7 +491,7 @@ public @interface RequestMapping {
 
 下面我们对其中的几个方法进行简单说明。
 
-#### 2.5.1 value和path
+#### 2.6.1 value和path
 
 这两个参数的效果是等价的，因为它们相互之间只是一个别名的关系。这两个参数用来指定该控制器要映射的url，这里我们列举一下常见的url映射配置方式：
 
@@ -519,7 +512,7 @@ public @interface RequestMapping {
         return SUCCESS;
     }
 
-#### 2.5.2 params
+#### 2.6.2 params
 
 该参数用来限制只有当请求中包含指定参数名的数据时才会被处理，比如:
 
@@ -545,7 +538,7 @@ public class RequestParameterController1 {
 
 还要注意，从`@RequestMapping`中的`params`定义中可以看出，它是一个数组，当指定多个值的时候，这些值之间属于'且'的关系，即两个参数同时包含才行。
 
-#### 2.5.3 consumes
+#### 2.6.3 consumes
 
 consumes用来指定该控制器要处理的请求的数据类型，所谓媒体类型就是指`text/plain` `application/json`等等。
 它们会被放在请求的请求头中，比如`Content-Type: application/x-www-form-urlencoded`表示请求的数据为key/value数据，
@@ -559,12 +552,12 @@ consumes用来指定该控制器要处理的请求的数据类型，所谓媒体
 
 比如以上控制器只接受json类型的数据。当请求的数据非json的时候是不会被其处理的。
 
-#### 2.5.4 produces
+#### 2.6.4 produces
 
 produces用来指定当前的请求希望得到什么类型的数据，这个参数在请求的时候会被放到请求头的Accept中。
 只有当请求的Accept类型与控制器中使用`produces`指定的类型相同的时候才会被该控制器接受并处理。
 
-#### 2.5.5 headers
+#### 2.6.5 headers
 
 如果说前面的consumes和produces用来指定请求的和希望得到的数据类型是一种特例的话，
 那么这里的headers则是可以用来更加灵活地指定headers中需要包含那些信息才能被当前的控制器处理。
