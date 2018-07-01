@@ -331,121 +331,261 @@ public class TheFilter implements Filter {
 
 这里配置的就是整个应用的上下文，配置的`ContextLoaderListener`会在容器启动的时候自动初始化应用程序上下文。而该应用程序上下文的配置文件就由上面的`context-param`来指定。应用程序上下文通常用来加载整个程序的基础类，比如DAO层和Service层等。这样它们就可以与任何其他的Web层配合使用。而Servlet配置的上下文通常用来加载Web层需要的类，比如Controller、HandlerMapping、HandlerAdapter等等。
 
+### 2.4 拦截器
 
+在`DispatcherServlet`种拦截器处理的逻辑是非常简单易懂的。
+`DispatcherServlet`会在的核心方法`doDispatch()`的不同的处理阶段调用`HandlerExecutionChain`的三个方法（在新版本的Spring中相关的逻辑被抽取出来封装成了独立的方法）。
 
+1. `HandlerExecutionChain.applyPreHandle()`会在`Contoller`的方法被执行之前调用；
+2. `HandlerExecutionChain.applyPostHandle()`会在`Contoller`的方法被执行之后，并且视图被渲染之前调用，如果中间出现异常则不会被调用；`
+3. `HandlerExecutionChain.triggerAfterCompletion()会在`Contoller`的视图被渲染之后调用，无论是否异常，总是被调用；`
 
+那么，在这三个方法中又做了什么呢？下面就是相关的逻辑，实际上三个方法是类似的，即从一个数组中取出定义的拦截器进行遍历调用：
 
-
-
-
-
-
-
-
-
-
-### 3.使用注解定义SpringMVC
-
-#### 1.示例
-
-首先定义一个控制器，这里使用@RequestMapping注解指定它映射到的路径，
-
-	@Controller
-	public class HelloController {
-	
-	    @RequestMapping(value = "/hello")
-	    public String sayHello() throws Exception {
-	        ModelAndView mv = new ModelAndView();
-	        //添加模型数据 可以是任意的POJO对象
-	        mv.addObject("message", "Hello World!");
-	        //设置逻辑视图名，视图解析器会根据该名字解析到具体的视图页面
-	        mv.setViewName("hello");
-	        return "hello";
-	    }
+    boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HandlerInterceptor[] interceptors = this.getInterceptors();
+        if (!ObjectUtils.isEmpty(interceptors)) {
+            for(int i = 0; i < interceptors.length; this.interceptorIndex = i++) {
+                HandlerInterceptor interceptor = interceptors[i];
+                if (!interceptor.preHandle(request, response, this.handler)) {
+                    this.triggerAfterCompletion(request, response, (Exception)null);
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-在springmvc-servlet.xml中做如下定义：
+所以，这部分的逻辑也不复杂。那么，那么我们看下如何在Spring MVC中使用拦截器：
 
-    <context:component-scan base-package="my.shouheng.*"/>
-    <context:annotation-config/>
+    <bean name="interceptor" class="me.shouheng.spring.mvc.TestInterceptor"/>
 
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/jsp/"/>
-        <property name="suffix" value=".jsp"/>
-    </bean>
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/hello2.mvc"/>
+            <ref bean="interceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
-注意这里使用了默认的HandlerMapping和Adapter。这里的包名会有影响。
+我们还是在之前的`spring_is_coming-servlet.xml`中加入上面的几行代码，这里我们用到了一个自定义的拦截器，下面我们给出它的定义：
 
-浏览器输入http://localhost:8080/palm/web/hello可以达到相同的效果。
+```
+public class TestInterceptor extends HandlerInterceptorAdapter {
 
-这里的@RequstMapping也可以被用在类上面，还可以指定多个映射路径，比如@RequestMapping({"/", "/homepage"})
-
-#### 2.接受请求的输入
-
-
-1.通过路径参数接受输入：
-
-    @RequestMapping(value = "/hello")
-    public String sayHello(@RequestParam(value = "num", defaultValue = "10") int num) throws Exception {
-        System.out.println(num);
-        return "hello";
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("=========preHandle");
+        return super.preHandle(request, response, handler);
     }
 
-这里通过@RequestParam指定参数的名称，可以使用defaultValue指定默认参数。
-
-使用的方式是：http://localhost:8080/palm/web/hello?num=22
-
-另一种方式是:
-
-    @RequestMapping(value = "/hi/{num}")
-    public String sayHi(@PathVariable("num") int num) throws Exception {
-        System.out.println(num);
-        return "hello";
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        System.out.println("=========postHandle");
+        super.postHandle(request, response, handler, modelAndView);
     }
 
-它的使用方式是：http://localhost:8080/palm/web/hi/22
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("=========afterCompletion");
+        super.afterCompletion(request, response, handler, ex);
+    }
 
+    @Override
+    public void afterConcurrentHandlingStarted(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("=========afterConcurrentHandlingStarted");
+        super.afterConcurrentHandlingStarted(request, response, handler);
+    }
+}
+```
 
+然后，我们使用`<mvc:interceptor>`标签定义了对应的拦截器及其要匹配的路径。这样当访问指定的url时，在触发响应的Controller的时候就会调用到我们定义的拦截器。
 
-### 4.过滤器
+这里我们还要说明一下`HandlerInterceptorAdapter`中的几个方法。
+实际上所有的拦截器最终都是实现了接口`HandlerInterceptor`，而上面的类中的前三个方法实际上就是来自于该接口。
+在`preHandle()`的返回值默认是true，表示当前拦截器处理完毕之后会继续让下一个拦截器来处理。
+实际上参考上面的`HandlerExecutionChain.applyPreHandle()`方法也能看出这一点。
 
-首先定义Filter：
+### 2.5 基于注解的配置方式
 
-	public class TheFilter implements Filter{
-	
-	    public void init(FilterConfig filterConfig) throws ServletException {
-	        System.out.println("init, filterConfig" + filterConfig);
-	    }
-	
-	    public void doFilter(ServletRequest servletRequest,
-	                         ServletResponse servletResponse,
-	                         FilterChain filterChain) throws IOException, ServletException {
-	        System.out.println("doFilter, servletRequest: " + servletRequest
-	                + "\nservletResponse: " + servletResponse
-	                + "\nfilterChain: " + filterChain);
-	        // 必须调用这个方法，否则请求就要在这里被拦截了
-	        filterChain.doFilter(servletRequest, servletResponse);
-	    }
-	
-	    public void destroy() {
-	        System.out.println("destroy");
-	    }
-	}
+在基于注解的配置方式中，我们需要对上面的配置做一些修改。首先，我们使用基于注解的适配器和映射机制。在`spring_is_coming-servlet.xml`中，我们将之前的代码替换为：
 
-注意，如果想要请求继续执行就必须调用filterChain.doFilter(servletRequest, servletResponse)，它让其他的过滤器对请求继续进行处理。如果没有这句话的话，该请求就会在这里被拦截掉。
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
 
-然后在XML中配置过滤器：
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
 
-    <filter>
-        <filter-name>TheFilter</filter-name>
-        <filter-class>my.shouheng.mvc.TheFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>TheFilter</filter-name>
-        <url-pattern>/web/*</url-pattern>
-    </filter-mapping>
+注意上面的这两行代码是Spring 3.1之后的配置方式，而3.1之前的代码在最新的Spring版本中已经移除，不再赘诉。
 
+然后，我们定义如下的Controller：
 
+```
+@Controller
+public class HelloController3 {
 
+    @RequestMapping(value = "/hello3")
+    public ModelAndView handle() {
+        ModelAndView mv = new ModelAndView();
+        // 添加模型数据 可以是任意的POJO对象
+        mv.addObject("message", "Hello Spring MVC!");
+        // 设置逻辑视图名，视图解析器会根据该名字解析到具体的视图页面
+        mv.setViewName("hello3");
+        return mv;
+    }
+}
+```
 
+这里的配置方式和之前基于Bean名称映射的机制类似，只是这里使用都是基于注解的配置方式。在作为Controller使用的类上面，我们要使用`@Controller`注解，具体的业务层方法上面使用`@RequestMapping`注解并指定映射的路径。然后，我们将该Bean注册到上下文当中：
 
+    <bean class="me.shouheng.spring.mvc.HelloController3"/>
+
+这样基本的配置方式就已经完成了。然后，运行Web容器并输入url:http://localhost:8080/hello3即可。还要注意下，还要修改web.xml中的Servlet的匹配路径，如果是`*.mvc`的话要改成`/`。
+
+其实这里的配置方式和之前的配置方式唯一的区别也就在于，将映射的规则从之前的**Bean名到url**转换成了**注解到url**。
+
+除了上面的那种方式配置url路径，我们还可以添加各种子路径。比如：
+
+```
+@Controller
+@RequestMapping("/user")
+public class HelloController3 {
+
+    @RequestMapping(value = "/hello3")
+    public ModelAndView handle() {
+        ModelAndView mv = new ModelAndView();
+        // 添加模型数据 可以是任意的POJO对象
+        mv.addObject("message", "Hello Spring MVC!");
+        // 设置逻辑视图名，视图解析器会根据该名字解析到具体的视图页面
+        mv.setViewName("hello3");
+        return mv;
+    }
+}
+```
+
+按照上面的方式，将会匹配到：/user/hello3。
+
+从上面看出使用注解的配置方式中，核心的配置应该属于`@RequestMapping`注解。下面是该注解的定义：
+
+```
+public @interface RequestMapping {
+    String name() default "";
+
+    @AliasFor("path")
+    String[] value() default {};
+
+    @AliasFor("value")
+    String[] path() default {};
+
+    RequestMethod[] method() default {};
+
+    String[] params() default {};
+
+    String[] headers() default {};
+
+    String[] consumes() default {};
+
+    String[] produces() default {};
+}
+```
+
+其中:
+
+1. `name`用来为当前的控制器指定一个名称；
+2. `value`和`path`是等价的，都是用来指定url的匹配规则的；
+3. `method`用来指定匹配的方法，比如POST, GET等等；
+4. `consumes`用来指定请求的提交内容类型（Content-Type），例如application/json, text/html；
+5. `params`：指定request中必须包含某些参数值是，才让该方法处理；
+6. `headers`：指定request中必须包含某些指定的header值，才能让该方法处理请求；
+7. `produces`：指定request中必须包含某些指定的header值，才能让该方法处理请求；
+
+下面我们对其中的几个方法进行简单说明。
+
+#### 2.5.1 value和path
+
+这两个参数的效果是等价的，因为它们相互之间只是一个别名的关系。这两个参数用来指定该控制器要映射的url，这里我们列举一下常见的url映射配置方式：
+
+1. `@RequestMapping(value={"/test1", "/user/create"})`：多个URL路径映射到同一个处理器；
+2. `@RequestMapping(value="/users/{userId}")`：使用url占位符，如"/users/123456"或"/users/abcd"，通过`@PathVariable`可以提取URI模板模式中的变量；
+3. `@RequestMapping(value="/users/**")`：可以匹配“/users/abc/abc”，但“/users/123”将会被2中的模式优先映射到；
+4. `@RequestMapping(value="/product?")`：可匹配“/product1”或“/producta”，但不匹配“/product”或“/productaa”；
+5. `@RequestMapping(value="/product*")`：可匹配“/productabc”或“/product”，但不匹配“/productabc/abc”；
+6. `@RequestMapping(value="/product/*")`：可匹配“/product/abc”，但不匹配“/productabc”
+7. `@RequestMapping(value="/products/**/{productId}")`：可匹配“/products/abc/abc/123”或“/products/123”；
+8. 基于正则表达式的方式。
+
+配置方式2方式的特别说明，指定路径中的参数并在方法中获取参数的具体示例：
+
+    @RequestMapping("/testPathVariable/{id}")
+    public String testPathVariable(@PathVariable("id") Integer id2) {
+        System.out.println("testPathVariable: " + id2);
+        return SUCCESS;
+    }
+
+#### 2.5.2 params
+
+该参数用来限制只有当请求中包含指定参数名的数据时才会被处理，比如:
+
+```
+@Controller
+@RequestMapping("/parameter1")                                      //①处理器的通用映射前缀
+public class RequestParameterController1 {
+    @RequestMapping(params="create", method=RequestMethod.GET) 
+    public String showForm() {
+	    ....
+    }
+    @RequestMapping(params="create", method=RequestMethod.POST)  
+    public String submit() {
+	    ....       
+    }
+}
+```
+
+其中的第一个方法表示请求中有“create”的参数名且请求方法为“GET”即可匹配，如可匹配的请求URL“http://×××/parameter1?create”；
+第二个方法表示请求中有“create”的参数名且请求方法为“POST”即可匹配。
+
+当然你还可以进一步限制当请求中包含指定的参数并且为指定的值时才能被处理，比如`@RequestMapping(params="submitFlag=create", method=RequestMethod.GET)`：表示请求中有“submitFlag=create”且请求方法为“GET”才可匹配。
+
+还要注意，从`@RequestMapping`中的`params`定义中可以看出，它是一个数组，当指定多个值的时候，这些值之间属于'且'的关系，即两个参数同时包含才行。
+
+#### 2.5.3 consumes
+
+consumes用来指定该控制器要处理的请求的数据类型，所谓媒体类型就是指`text/plain` `application/json`等等。
+它们会被放在请求的请求头中，比如`Content-Type: application/x-www-form-urlencoded`表示请求的数据为key/value数据，
+只有当请求数据与控制器在`@RequestMapping`中指定的数据相同的时候，指定的请求才会被该控制器处理。
+
+    @RequestMapping(value = "/testMethod", method = RequestMethod.POST,consumes="application/json")
+    public String testMethod() {
+        System.out.println("testMethod");
+        return SUCCESS;
+    }
+
+比如以上控制器只接受json类型的数据。当请求的数据非json的时候是不会被其处理的。
+
+#### 2.5.4 produces
+
+produces用来指定当前的请求希望得到什么类型的数据，这个参数在请求的时候会被放到请求头的Accept中。
+只有当请求的Accept类型与控制器中使用`produces`指定的类型相同的时候才会被该控制器接受并处理。
+
+#### 2.5.5 headers
+
+如果说前面的consumes和produces用来指定请求的和希望得到的数据类型是一种特例的话，
+那么这里的headers则是可以用来更加灵活地指定headers中需要包含那些信息才能被当前的控制器处理。
+比如：
+
+    @RequestMapping(value = "testParamsAndHeaders", params = { "username","age!=10" }, headers = { "Accept-Language=US,zh;q=0.8" })
+    public String testParamsAndHeaders() {
+        System.out.println("testParamsAndHeaders");
+        return SUCCESS;
+    }
+
+用来设定请求头中第一语言必须为US。
+
+## 3、其他
+
+### 3.1 拦截器和过滤器的区别
+
+1. 拦截器是基于java的反射机制的，过滤器是基于函数回调；
+2. 拦截器不依赖于servlet容器，过滤器依赖于servlet容器，因为过滤器是Servlet规范规定的，只用于Web程序中，而拦截器可以用在Appliaction和Swing等中；
+3. 在Action的生命周期中，拦截器可以多次被调用，而过滤器只能在容器初始化时被调用一次；
+4. 拦截器可以获取IOC容器中的各个bean，而过滤器就不行，这点很重要，在拦截器里注入一个service，可以调用业务逻辑;
+5. 过滤器是在请求进入容器后，但请求进入servlet之前进行预处理的。请求结束返回也是，是在servlet处理完后，返回给前端之前。
+
+实际上从上面的配置中也可以看出来，过滤器在请求达到Servlet之前被调用的，它属于Servlet而不属于Spring。
