@@ -78,4 +78,25 @@ java -jar D:\jetty\jetty-distribution-9.4.11.v20180605\start.jar --add-to-startd
 java -jar D:\jetty\jetty-distribution-9.4.11.v20180605\start.jar jetty.ssl.port=8444
 ```
 
+## 4、在Intellij中使用Jetty
 
+我们可以在Intellij中直接使用Jetty部署我们的SpringMVC项目。在Maven中的配置方式也比较简单，只要在`pom.xml`的`plugins`中加入如下的插件即可：
+
+```
+<!--jetty插件-->
+<plugin>
+     <groupId>org.eclipse.jetty</groupId>
+     <artifactId>jetty-maven-plugin</artifactId>
+     <version>9.4.11.v20180605</version>
+     <configuration>
+         <stopPort>9988</stopPort>
+         <stopKey>foo</stopKey>
+         <scanIntervalSeconds>5</scanIntervalSeconds>
+         <webAppConfig>
+              <contextPath>/</contextPath>
+         </webAppConfig>
+    </configuration>
+</plugin>
+```
+
+这样配置完成之后在Maven Project标签页下面的Plugins下面就会出现一个Jetty的目录，我们直接双击`jetty:run`即可运行我们的项目
