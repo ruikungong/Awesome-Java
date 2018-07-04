@@ -66,4 +66,134 @@ public class AuthenticationTest {
 之后，我们使用用户和密码创建一个Token，并调用上面的`Subject`的`login`方法尝试进行登录。
 最终的登录信息存储在subject中，我们可以通过其中的一些方法来获取，比如上面的`isAuthenticated()`就是用来判断用户是否被认证成功的。
 
+## 2、Shiro认证 授权和自定义Realm
+
+上面我们已经见识过了Shiro的Realm的一种简单的使用方式`SimpleAccountRealm`，实际上它还有许多不同的Realm可以供我们使用。
+通过上面的代码，我们应该对Realm有一个初步的印象，即不严谨地讲，Realm就是用来从指定的数据源中获取用户的权限、角色等相关的信息的。
+它不是数据源而是封装了一些操作指定类型的数据源的方法。下面我们看以下Shiro中各种不同类型的Realm的使用方式。
+
+### 2.1 IniRealm
+
+IniRealm用来从`ini`类型的文件中加载用户的信息，我们先在resources文件夹下面创建一个名为`users.ini`的文件，其中加入下面几行代码：
+
+```
+[users]
+WngShhng=123456,admin
+[roles]
+admin=user:delete
+```
+
+这里我们按照IniRealm的要求的格式定义了一些用户的信息，然后我们就可以使用该文件中存储的信息进行单元测试：
+
+```
+public class IniRealmTest {
+
+    @Test
+    public void testWithIniFiles() {
+        IniRealm iniRealm = new IniRealm("classpath:users.ini");
+
+        DefaultSecurityManager securityManager = new DefaultSecurityManager();
+        securityManager.setRealm(iniRealm);
+
+        SecurityUtils.setSecurityManager(securityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        AuthenticationToken authenticationToken = new UsernamePasswordToken("WngShhng", "123456");
+        // 校验用户是否已经登录（是否存在该账号的记录）
+        subject.login(authenticationToken);
+        System.out.println("Is authenticated" + subject.isAuthenticated());
+        // 校验用户角色
+        subject.checkRole("admin");
+        subject.checkPermission("user:delete");
+        subject.checkPermission("user:update");
+    }
+}
+```
+
+从这里，我们看出这里的代码和1.2中的代码大部分都一样，只有设置Realm部分，这里是从ini文件中读取的用户信息。
+除了用户的身份信息，这里我们还增加了用户的角色和权限等信息的校验。具体该文件中如何配置用户信息可以查看相关的文档。
+
+### 2.2 JdbcRealm
+
+JdbcRealm就是将数据源设置成了数据库，这里我们使用MySQL作为数据源。我们在程序中作如下的配置:
+
+1.首先，我们要使用MySQL连接器，并且使用阿里的Druid的数据连接池：
+
+```
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.11</version>
+</dependency>
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>druid</artifactId>
+    <version>1.1.10</version>
+</dependency>
+```
+
+然后我们进行如下的测试：
+
+```
+public class JdbcRealmTest {
+
+    private DruidDataSource druidDataSource = new DruidDataSource();
+
+    {
+        druidDataSource.setUrl("jdbc:mysql://localhost:3306/shiro_test?serverTimezone=GMT%2B8");
+        druidDataSource.setUsername("root");
+        druidDataSource.setPassword("xxxxxx");
+    }
+
+    @Test
+    public void testJdbcRealm() {
+        // 查看JdbcRealm的代码里面定义了一些SQL，其实本质上就是通过这些SQL来查询用户信息的
+        JdbcRealm jdbcRealm = new JdbcRealm();
+        jdbcRealm.setDataSource(druidDataSource);
+
+        DefaultSecurityManager securityManager = new DefaultSecurityManager();
+        securityManager.setRealm(jdbcRealm);
+
+        SecurityUtils.setSecurityManager(securityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("WngShhng", "123456");
+        subject.login(token);
+    }
+}
+
+```
+
+从上面的代码可以看出，这里的配置方式和上面的基本一样。只是这里我们将Realm的数据源切换成了MySQL数据库。
+
+在执行上面的单元测试之前，我们还需要在数据库中添加一张表：
+
+```
+create table if not exists users (
+    username varchar(255),
+	password varchar(255)
+);
+```
+
+然后我们向该数据库中插入一条数据：
+
+```
+insert into users("WngShhng", "123456");
+```
+
+这样我们执行单元测试就可以通过了。
+
+我们本身没有写什么SQL，在进行校验的时候这些逻辑都被封装进了JdbcRealm里面，你可以进入JdbcRealm查看里面的代码：
+
+```
+    protected static final String DEFAULT_AUTHENTICATION_QUERY = "select password from users where username = ?";
+    protected static final String DEFAULT_SALTED_AUTHENTICATION_QUERY = "select password, password_salt from users where username = ?";
+    protected static final String DEFAULT_USER_ROLES_QUERY = "select role_name from user_roles where username = ?";
+    protected static final String DEFAULT_PERMISSIONS_QUERY = "select permission from roles_permissions where role_name = ?";
+	......
+```
+
+所以，当我们不去设置SQL等的信息的时候，默认会去执行上面的SQL，而我们创建表的时候的SQL也是从上面的几行SQL中总结出来的。
+
+
 
