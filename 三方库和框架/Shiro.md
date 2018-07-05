@@ -195,5 +195,118 @@ insert into users("WngShhng", "123456");
 
 所以，当我们不去设置SQL等的信息的时候，默认会去执行上面的SQL，而我们创建表的时候的SQL也是从上面的几行SQL中总结出来的。
 
+如果要使用权限的信息还要设置JdbcRealm的开关为打开状态：
+
+```
+jdbcRealm.setPermissionsLookupEnabled(true)
+```
+
+上面我们使用的Shiro为我们提供的默认的SQL来进行数据查询的，我们也可以自定义一些SQL来进行查询，比如
+
+```
+jdbcRealm.setUserRolesQuery("select ....");
+```
+
+JdbcRealm当中还有许多类似的方法可供我们使用，我们可以将这些SQL注入到JdbcRealm当中，然后Shiro就会使用我们指定的SQL进行数据查询。
+
+### 2.3 自定义Realm
+
+除了使用Shiro为我们提供的Realm，我们还可以自定义Realm，我们可以使用自定义Realm来集成其他的框架，比如使用一些缓存来作为数据源等，
+这极大地提升了我们设置数据源的灵活性。这里我们通过一个简单的例子来演示一下Shiro中自定义Realm的内容。
+
+通过查看JdbcRealm的代码，我们知道它是继承自AuthorizingRealm，所以在自定义Realm的时候，我们也从该类进行拓展。
+
+```
+public class CustomRealm extends AuthorizingRealm {
+
+    // 用来模拟用户信息数据源
+    private Map<String, String> maps = new HashMap<>();
+
+    {
+        maps.put("WngShhng", "123456");
+        super.setName("customRealm");
+    }
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        String userName = (String) authenticationToken.getPrincipal();
+        String password = getPasswordByUyUserName(userName);
+
+        // 通过将包装之后的AuthenticationInfo返回，用于检查用户的验证信息
+        return new SimpleAuthenticationInfo(userName, password, "customRealm");
+    }
+
+    private String getPasswordByUyUserName(String userName) {
+        return maps.get(userName);
+    }
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        String userName = (String) principalCollection.getPrimaryPrincipal();
+
+        // 这里用来模拟从指定数据源中获取指定用户的角色和权限信息
+        Set<String> roles = getRolesByUserName(userName);
+        Set<String> permissions = getPermissionByUserName(userName);
+
+        // 授权信息，将包装之后的AuthorizationInfo返回，内部设置了该用户的权限和角色信息
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        authorizationInfo.setRoles(roles);
+        authorizationInfo.setStringPermissions(permissions);
+
+        return authorizationInfo;
+    }
+
+    // 模拟获取指定用户的角色
+    private Set<String> getRolesByUserName(String userName) {
+        Set<String> roles = new HashSet<>();
+        roles.add("Admin");
+        roles.add("User");
+        return roles;
+    }
+
+    // 模拟获取指定用户的权限
+    private Set<String> getPermissionByUserName(String userName) {
+        Set<String> permissions = new HashSet<>();
+        permissions.add("do-1");
+        permissions.add("do-2");
+        permissions.add("do-3");
+        return permissions;
+    }
+}
+```
+
+AuthorizingRealm的两个方法的作用不难理解，它们用来根据指定的用户名来获取该用户的密码、角色和权限等，然后将获取到的结果包装到一个对象中返回。
+随后，Shiro会根据我们返回的对象来判断该用户是否具有指定的角色和权限等信息。
+
+根据上面的定义，我们进行如下的单元测试：
+
+```
+public class CustomRealmTest {
+
+    @Test
+    public void testCustomRealm() {
+        CustomRealm customRealm = new CustomRealm();
+
+        DefaultSecurityManager securityManager = new DefaultSecurityManager();
+        securityManager.setRealm(customRealm);
+
+        SecurityUtils.setSecurityManager(securityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        AuthenticationToken authenticationToken = new UsernamePasswordToken("WngShhng", "123456");
+        // 校验用户是否已经登录（是否存在该账号的记录）
+        subject.login(authenticationToken);
+        System.out.println("Is authenticated" + subject.isAuthenticated());
+        // 校验用户角色
+        subject.checkRoles("Admin", "User");
+
+        subject.checkPermissions("do-1", "do-2");
+    }
+}
+```
+
+从上面的代码我们可以看出，自定义Realm的时候主要是根据传入的用户信息在覆写的两个方法中进行查询并返回授权和验证信息，
+关键的一步在于从某个数据源中取用户的信息。所以，通过自定义Realm，我们可以很方便地使用各种数据源与Shiro集成。
+
 
 
