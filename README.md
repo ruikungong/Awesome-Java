@@ -2,7 +2,7 @@
 
 > Java 语言相关的API，第三方库和计算机基础理论等知识的学习和整理
 
-更多 : [前端](https://github.com/Shouheng88/Front-end-notes)  [Android](https://github.com/Shouheng88/Android-notes)  [Python](https://github.com/Shouheng88/Python-notes)
+更多 : [前端](https://github.com/Shouheng88/Front-end-notes)  |  [Android](https://github.com/Shouheng88/Android-notes)  |  [Python](https://github.com/Shouheng88/Python-notes)
 
 ## 目录
 
@@ -47,14 +47,20 @@
 
 <h3 id="collection">集合框架</h3>
 
+*Java集合框架，并发容器，同步容器等*
+
 * [Java容器概览](Java语言和JDK源码/集合框架/Java容器概览.md)
 
 <h3 id="java-io">IO框架</h3>
+
+*Java基础字节流 字符流 NIO等*
 
 * [基础IO](Java语言和JDK源码/IO编程/基础IO.md)
 * [高级IO](Java语言和JDK源码/IO编程/高级IO.md)
 
 <h3 id="java-8">Java8</h3>
+
+*Java8语言的行为参数化和流编程等*
 
 * [五分钟学习Java8行为参数化](Java语言和JDK源码/Java8/五分钟学习Java8行为参数化.md)
 * [五分钟学习Java8的流编程](Java语言和JDK源码/Java8/五分钟学习Java8的流编程.md)
