@@ -308,5 +308,78 @@ public class CustomRealmTest {
 从上面的代码我们可以看出，自定义Realm的时候主要是根据传入的用户信息在覆写的两个方法中进行查询并返回授权和验证信息，
 关键的一步在于从某个数据源中取用户的信息。所以，通过自定义Realm，我们可以很方便地使用各种数据源与Shiro集成。
 
+## 3、Shiro加密、安全
+
+Shiro向我们提供了一些方法用来对账号信息进行加密，并在校验账号信息的时候使用。这里我们看一下Shiro加密和安全框架的基本使用方法。
+
+### 3.1 使用加密算法
+
+在校验用户的信息我们使用下面的配置：
+
+```
+public class CustomRealmTest {
+
+    @Test
+    public void testCustomRealm() {
+        CustomRealm customRealm = new CustomRealm();
+
+        DefaultSecurityManager securityManager = new DefaultSecurityManager();
+        securityManager.setRealm(customRealm);
+
+        // 设置加密算法
+        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
+        matcher.setHashAlgorithmName("md5");
+        matcher.setHashIterations(1);
+        customRealm.setCredentialsMatcher(matcher);
+
+        SecurityUtils.setSecurityManager(securityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        AuthenticationToken authenticationToken = new UsernamePasswordToken("WngShhng", "123456");
+        // 校验用户是否已经登录（是否存在该账号的记录）
+        subject.login(authenticationToken);
+        System.out.println("Is authenticated" + subject.isAuthenticated());
+    }
+}
+```
+
+然后在我们的Realm中查询数据的时候要返回用Md5加密之后的用户密码，也就是说，当你向数据库中存储用户密码的时候需要使用md5加密之后的数据。
+所以，我们需要对上面的CustomeRealm做如下的修改，也就是数据源中使用了加密之后的用户密码。
+
+    {
+        maps.put("WngShhng", "e10adc3949ba59abbe56e057f20f883e");
+        super.setName("customRealm");
+    }
+
+我们可以使用Shiro提供的Md5Hash来获取加密之后的密码：
+
+```
+Md5Hash md5Hash = new Md5Hash("123456")
+```
+
+### 3.2 密码加盐
+
+想要在Shiro中对密码进行加盐处理，首先存储在数据源中的数据是加盐之后的，然后需要在自定义Realm的`doGetAuthenticationInfo()`方法中指定加盐信息。
+
+我们可以使用Md5Hash来获取加盐之后的密码，下面的函数中参数`67890`就是用盐。我们可以用下面的函数获取加盐之后的密码，并将其存储到数据源中：
+
+```
+Md5Hash md5Hash = new Md5Hash("123456", "67890");
+```
+
+然后，我们还要在自定义Realm中进行一些处理，来指定加盐信息：
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        String userName = (String) authenticationToken.getPrincipal();
+        String password = getPasswordByUyUserName(userName);
+
+        SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(userName, password, "customRealm");
+        simpleAuthenticationInfo.setCredentialsSalt(ByteSource.Util.bytes("67890"));
+        return simpleAuthenticationInfo;
+    }
+
+这里我们在返回`SimpleAuthenticationInfo`的时候，使用了它的`setCredentialsSalt()`方法，
+并使用`ByteSource.Util.bytes("67890")`从字符串中获取一个ByteSource对象，并赋值给`setCredentialsSalt()`方法。
 
 
