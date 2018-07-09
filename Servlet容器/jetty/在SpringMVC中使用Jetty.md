@@ -99,4 +99,4 @@ java -jar D:\jetty\jetty-distribution-9.4.11.v20180605\start.jar jetty.ssl.port=
 </plugin>
 ```
 
-这样配置完成之后在Maven Project标签页下面的Plugins下面就会出现一个Jetty的目录，我们直接双击`jetty:run`即可运行我们的项目
+这样配置完成之后在Maven Project标签页下面的Plugins下面就会出现一个Jetty的目录，我们直接双击`jetty:run`即可运行我们的项目。

@@ -382,4 +382,7 @@ Md5Hash md5Hash = new Md5Hash("123456", "67890");
 这里我们在返回`SimpleAuthenticationInfo`的时候，使用了它的`setCredentialsSalt()`方法，
 并使用`ByteSource.Util.bytes("67890")`从字符串中获取一个ByteSource对象，并赋值给`setCredentialsSalt()`方法。
 
+## 4、Shiro和Spring集成
+
+
 
