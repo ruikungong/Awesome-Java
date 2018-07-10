@@ -96,4 +96,64 @@
 * [图论-最小生成树](数据结构/11.图论-最小生成树.md)
 * [图论-最短路径](数据结构/12.图论-最短路径.md)
 
+<h3 id="design-pattern">设计模式</h3>
 
+*常用设计模式的Java语言描述*
+
+* [UML-面向对象六大特点](设计模式/1.UML-面向对象六大特点.md)
+* [桥接模式](设计模式/2.桥接模式.md)
+* [策略模式](设计模式/3.策略模式.md)
+* [单例模式](设计模式/4.单例模式.md)
+* [构建者模式](设计模式/5.构建者模式.md)
+* [命令模式](设计模式/6.命令模式.md)
+* [装饰者模式](设计模式/7.装饰者模式.md)
+* [工厂模式](设计模式/8.工厂模式.md)
+* [代理模式](设计模式/9.代理模式.md)
+* [解释器模式](设计模式/10.解释器模式.md)
+* [备忘录模式](设计模式/11.备忘录模式.md)
+* [享元模式](设计模式/12.享元模式.md)
+* [迭代器模式与组合模式](设计模式/13.迭代器模式与组合模式.md)
+* [中介者模式](设计模式/14.中介者模式.md)
+* [原型模式](设计模式/15.原型模式.md)
+* [责任链模式](设计模式/16.责任链模式.md)
+* [状态模式](设计模式/17.状态模式.md)
+* [模板模式](设计模式/18.模板模式.md)
+* [观察者模式](设计模式/19.观察者模式.md)
+* [适配器和门面模式](设计模式/20.适配器和门面模式.md)
+* [MVC](设计模式/21.MVC.md)
+* [访问者模式](设计模式/Visitor.md)
+
+<h3 id="database">数据库</h3>
+
+*与数据库相关的，MySQL以及MySQL高性能*
+
+* [MySQL基础](MySQL/MySQL基础.md)
+* [高性能MySQL](MySQL/高性能MySQL.md)
+* [乐观锁和悲观锁](MySQL/乐观锁和悲观锁.md)
+
+<h3 id="framework">框架</h3>
+
+*Spring, Spring MVC, MyBatis, Spring Boot*
+
+* [Spring基本](框架/Spring/Spring_基本.md)
+* [Spring IOC](框架/Spring/Spring_IOC.md)
+* [Spring AOP](框架/Spring/Spring_AOP.md)
+* [Spring 事务管理](框架/Spring/Spring_事务管理.md)
+* [Spring MVC](框架/Spring/Spring_MVC.md)
+* [错误记录](框架/Spring/Errors.md)
+
+* [MyBatis映射问题](框架/MyBatis/MyBatis映射.md)
+
+<h3 id="library">工具库</h3>
+
+*Guava, JodaTime, Logging, Shiro, Apache*
+
+* [常用的Java第三方库JodaTime](工具库/JodaTime.md)
+* [权限和安全管理框架Shiro](工具库/Shiro.md)
+* [Java日志框架](工具库/Logging.md)
+* [Guava](工具库/Guava.md)
+* [Apache IO包](工具库/ApacheIO.md)
+
+<h3 id="network">计算机网络</h3>
+
+<h3 id="operating_system">操作系统</h3>
