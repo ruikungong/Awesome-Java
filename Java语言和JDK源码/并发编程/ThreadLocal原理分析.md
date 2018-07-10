@@ -45,11 +45,6 @@
 
 ## 2、ThreadLocal的作用原理
 
-在上面的程序中，我们将`ThreadLocal`定义为全局的静态变量。
-每次只要在指定的线程中调用`ThreadLocal`的`set()`和`get()`就可以读写保存到指定的线程名下的数据。
-其实，读写数据的时候，`ThreadLocal`每次会调用`Thread.currentThread()`方法获取当前的线程的实例，
-然后使用它作为键从哈希表中获取值。
-
 我们还是先从读取的操作来看。
 
 以下是`ThreadLocal`中`set()`方法的代码：
@@ -67,7 +62,7 @@
         return setInitialValue();
     }
 
-这里首先会再步骤1中获取到当前线程的实例，然后再步骤2中通过`getMap()`方法，使用当前的线程的`ThreadLocalMap`。
+这里首先会再步骤1中获取到当前线程的实例，然后在步骤2中通过`getMap()`方法，使用当前的线程的`ThreadLocalMap`。
 这里的`ThreadLocalMap`的定义如下：
 
     static class ThreadLocalMap {
@@ -101,21 +96,28 @@
     }
 
 也就是说实际上当我们调用`get()`方法的时候，会先获取当前线程中的`threadLocals`字段，该字段是`ThreadLocalMap`类型的。
-然后，我们使用当前的ThreadLocal实例作为键来从哈希表中获取到一个`Entry`，而实际的值就保存再`Entry`的`value`字段中。
+然后，我们使用当前的`ThreadLocal`实例作为键来从哈希表中获取到一个`Entry`，而实际的值就保存再`Entry`的`value`字段中。
 
 就像上面的`getEntry()`方法定义的那样，似乎这里的哈希表只是一个数组，那哈希冲突是怎么解决的呢？
 实际上，我们知道通常解决哈希冲突有两种解决方式，一种是拉链法，一种是线性探测法。
 前者在`HashMap`和`ConcurrentHashMap`中使用较多，而这里用到的其实就是线性探测法。
 说白了就是将所有的值放在一个数组里面然后根据散列的结果到数组中取值，具体的实现方式可以看相关的数据结构知识点。
 
-等下，这里的关系是不是有点乱。我们来捋一下：
+这里的关系是不是有点乱，我们来捋一下：
 
 我们使用`ThreadLocal`存储的值实际是存储在`Thread`使用`ThreadLocalMap`当中的，
-而这里的`ThreadLocal`实例值起到了一个哈希表的键的作用。
+而这里的`ThreadLocal`实例值起到了一个哈希表的键的作用：
 
 ![ThreadLocal](res/ThreadLocal.png)
 
+就像上图显示的那样，假如我们在线程`thread1`中调用了`threadLocal1`的`get()`方法，
+首先会用`Thread.currentThread()`方法获取到`thread1`，然后获取到`thread1`的`threadLocals`实例，
+`threadLocals`是一个`ThreadLocalMap`类型的哈希表。然后，我们再用`threadLocal1`作为键
+来从`threadLocals`中获取到值`Entry`，并从`Entry`中取出存储的值并返回。
+
 至此，我们已经了解了ThreadLocal的实现的原理，本来想看下`set()`方法的，但是到此已经基本真相大白了，所以也就没有继续下去的必要了。
+
+## 3、总结
 
 我们回过头来看下之前提出的几个问题：
 
