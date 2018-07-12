@@ -73,5 +73,20 @@ Java以后发展的几个方向：1).模块化，功能组件可插拔；2).混合语言：各不同的功能模块
 上面是三种基本的垃圾回收算法，但实际上，我们通常根据对象存活周期的不同将内存划分成几块，然后根据其特点采用不同的回收算法。
 这就是所谓的`分代收集算法`。
 
+#### 垃圾收集器
+
+*  Serial、ParNew、Parallel Scavenge、Serial Old、Parallel Old、CMS、G1*
+
+![垃圾收集器](https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3987877514,3271369785&fm=11&gp=0.jpg)
+
+HotSpot当中共有7种垃圾回收器，按照它们负责区域，又可以分成三种：
+
+1. 新生代收集器：Serial、ParNew、Parallel Scavenge；
+2. 老年代收集器：Serial Old、Parallel Old、CMS；
+3. 整堆收集器：G1；
+
+当搭配起来使用的时候又可以得到以下几种组合关系： Serial/Serial Old、Serial/CMS、ParNew/Serial Old、ParNew/CMS、Parallel Scavenge/Serial Old、Parallel Scavenge/Parallel Old、G1
+
+
 
 
