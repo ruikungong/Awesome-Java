@@ -232,3 +232,5 @@ EventBus中维护了三个缓存和四个映射：
 最后，EventBus中使用了非常多的数据结构，比如MultiMap、CopyOnWriteArraySet等，还有一些缓存和映射的工具库，这些大部分都来自于Guava。
 
 看了EventBus的实现，由衷地感觉Google的工程师真牛！而Guava中还有许多更加丰富的内容值得我们去挖掘！
+
+了解线程局部遍历可以参考下我的另一篇博文：[ThreadLocal的使用及其源码实现](https://juejin.im/post/5b44cd7c6fb9a04f980cb065)
