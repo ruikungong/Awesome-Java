@@ -91,7 +91,7 @@ EventBus的使用是非常简单的，首先你要添加`Guava`的依赖到自�
         // 创建一个哈希表
         Multimap<Class<?>, Subscriber> methodsInListener = HashMultimap.create();
         // 获取监听者的类型
-		Class<?> clazz = listener.getClass();
+        Class<?> clazz = listener.getClass();
         // 获取上述监听者的全部监听方法
         UnmodifiableIterator var4 = getAnnotatedMethods(clazz).iterator(); // 1
         // 遍历上述方法，并且根据方法和类型参数创建观察者并将其插入到映射表中
@@ -181,10 +181,54 @@ SubscriberRegistry中的`register()`方法与`unregister()`方法类似，我们
         return Iterators.concat(subscriberIterators.iterator());
     }
 
-这里注意以下3处的代码，它用来获取当前事件的所有的父类包含自身的类型构成的集合，也就是说，加入我们触发了一个Interger类型的事件，那么Number和Object等类型的监听方法都能接收到这个事件并触发。
+这里注意以下3处的代码，它用来获取当前事件的所有的父类包含自身的类型构成的集合，也就是说，加入我们触发了一个Interger类型的事件，那么Number和Object等类型的监听方法都能接收到这个事件并触发。这里的逻辑很简单，就是根据事件的类型，找到它及其所有的父类的类型对应的观察者并返回。
 
-接下来我们看真正的分发事件的逻辑是什么样的
+#### 2.2.2 Dispatcher
 
+接下来我们看真正的分发事件的逻辑是什么样的。
 
+从`EventBus.post()`方法可以看出，当我们使用Dispatcher进行事件分发的时候，需要将当前的事件和所有的观察者作为参数传入到方法中。然后，在方法的内部进行分发操作。最终某个监听者的监听方法是使用反射进行触发的，这部分逻辑在`Subscriber`内部，而Dispatcher是事件分发的方式的策略接口。EventBus中提供了3个默认的Dispatcher实现，分别用于不同场景的事件分发:
 
-	
+1. `ImmediateDispatcher`：直接在当前线程中遍历所有的观察者并进行事件分发；
+2. `LegacyAsyncDispatcher`：异步方法，存在两个循环，一先一后，前者用于不断往全局的队列中塞入封装的观察者对象，后者用于不断从队列中取出观察者对象进行事件分发；实际上，EventBus有个字类AsyncEventBus就是用该分发器进行事件分发的。
+3. `PerThreadQueuedDispatcher`：这种分发器使用了两个线程局部变量进行控制，当`dispatch()`方法被调用的时候，会先获取当前线程的观察者队列，并将传入的观察者列表传入到该队列中；然后通过一个布尔类型的线程局部变量，判断当前线程是否正在进行分发操作，如果没有在进行分发操作，就通过遍历上述队列进行事件分发。
+
+上述三个分发器内部最终都会调用Subscriber的`dispatchEvent()`方法进行事件分发：
+
+    final void dispatchEvent(final Object event) {
+        // 使用指定的执行器执行任务
+        this.executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    // 使用反射触发监听方法
+                    Subscriber.this.invokeSubscriberMethod(event);
+                } catch (InvocationTargetException var2) {
+                    // 使用EventBus内部的SubscriberExceptionHandler处理异常
+                    Subscriber.this.bus.handleSubscriberException(var2.getCause(), Subscriber.this.context(event));
+                }
+            }
+        });
+    }
+
+上述方法中的`executor`是执行器，它是通过`EventBus`获取到的；处理异常的SubscriberExceptionHandler类型也是通过`EventBus`获取到的。（原来EventBus中的构造方法中的字段是在这里用到的！）至于反射触发方法调用并没有太复杂的逻辑。
+
+另外还要注意下Subscriber还有一个字类SynchronizedSubscriber，它与一般的Subscriber的不同就在于它的反射触发调用的方法被`sychronized`关键字修饰，也就是它的触发方法是加锁的、线程安全的。
+
+## 总结：
+
+至此，我们已经完成了EventBus的源码分析。简单总结一下：
+
+EventBus中维护了三个缓存和四个映射：
+
+1. 事件类型到观察者列表的映射（缓存）；
+2. 事件类型到监听者方法列表的映射（缓存）；
+3. 事件类型到事件类型及其所有父类的类型的列表的映射（缓存）；
+4. 观察者到监听者的映射，观察者到监听方法的映射；
+
+观察者Subscriber内部封装了监听者和监听方法，可以直接反射触发。而如果是映射到监听者的话，还要判断监听者的方法的类型来进行触发。个人觉得这个设计是非常棒的，因为我们无需再在EventBus中维护一个映射的缓存了，因为Subscriber中已经完成了这个一对一的映射。
+
+每次使用EventBus注册和取消注册监听者的时候，都会先从缓存中进行获取，不是每一次都会用到反射的，这可以提升获取的效率，也解答了我们一开始提出的效率的问题。当使用反射触发方法的调用貌似是不可避免的了。
+
+最后，EventBus中使用了非常多的数据结构，比如MultiMap、CopyOnWriteArraySet等，还有一些缓存和映射的工具库，这些大部分都来自于Guava。
+
+看了EventBus的实现，由衷地感觉Google的工程师真牛！而Guava中还有许多更加丰富的内容值得我们去挖掘！
