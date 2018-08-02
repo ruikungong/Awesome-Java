@@ -162,10 +162,10 @@
 
 *Guava, JodaTime, Logging, Shiro, Apache*
 
+* [Guava-EventBus](工具库/Guava/EventBus.md)
 * [常用的Java第三方库JodaTime](工具库/JodaTime.md)
 * [权限和安全管理框架Shiro](工具库/Shiro.md)
 * [Java日志框架](工具库/Logging.md)
-* [Guava](工具库/Guava.md)
 * [Apache IO包](工具库/ApacheIO.md)
 
 <h3 id="network">计算机网络</h3>
