@@ -35,7 +35,7 @@
 * [Class](Java语言和JDK源码/Class.md)
 * [泛型](Java语言和JDK源码/泛型.md)
 * [异常](Java语言和JDK源码/异常.md)
-* [注解](Java语言和JDK源码/注解.md)
+* [Java 注解及其两种使用方法](Java语言和JDK源码/注解.md)
 
 <h3 id="concurrent">并发编程</h3>
 
