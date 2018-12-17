@@ -1,12 +1,141 @@
-# Class类
+# Java 基础回顾：泛型和 Class 类
 
-Class类包含了与类某个类有关的信息，Class也支持泛型。它们的效果是相同的，只是使用泛型具有编译器类型检查的效果，相对更加安全。
+## 1、泛型
 
-以下是使用Class类的一个测试例子。在这里我们可以通过反射来获取并修改private方法和private字段的accessible属性。当设置为true时，我们就可以对其进行调用或者修改。
+以 ArrayList 为例，在范型出现之前，ArrayList 的实现机制是内部管理一个 `Object[]` 类型的数组。比如` add` 方法以前是 `add(Object obj)`，现在是 `add(E e)`。那么以前的时候显然如果你定义一个 String 类型的 ArrayList，传入 File 类型也是可以的，因为它也继承自 Object。这显然就会出现错误！但是有了泛型之后，传入的只能是E类型的，不然会报错。也就是说，泛型给我们提供了一种类型检查的机制。
+
+Java泛型是使用类型擦除来实现的。它的好处只是提供了编译器类型检查机制。在泛型方法内部无法获取任何关于泛型参数类型的信息，泛型参数只是起到了占位的作用。如 `List<String>` 在运行时实际上是 List 类型，普通类型被擦除为 Object。因为泛型是擦除的，所以泛型不能用于显式地引用运行时类型的操作中，例如：转型、`instanceof` 操作或者 `new` 表达式。
+
+另外，
+
+1. 使用泛类型的代码意味着可以被很多不同类型的对象重用；
+2. Java 编译器最终将泛型版本编译为无泛型版本；
+3. 使用 extends 的意义就在于指定了擦除的上界。
+
+### 1.2 泛型类
+
+泛型类的声明与一般类的声明语法一致，但需要在声明的泛型类名称后使用 `<>` 指定一个或多个类型参数，如：
+
+    class MyClass <E> { } 或 class MyClass <K,V> { }
+
+### 1.3 泛型接口
+
+泛型接口的声明与一般接口的声明语法一致，但需要在声明的泛型接口名称后使用 `<>` 指定一个或多个类型参数，如：
+
+    interface IMyMap <E> 或 intetface IMyMap <K,V> 
+
+### 1.4 泛型方法
+
+从下面的示例中，我们可以看出当定义了一个泛型方法的时候，可以提高代码的复用性。如：
+
+    public void method(T e) { } 或 public void method(List<?> list)
+
+不过通常我们需要为泛型指定一个擦除上界来对泛型的范围进行控制。
+
+### 1.5 泛型参数的约束
+
+    <T extends 基类或接口> 或 <T extends 基类或接口1 & 基类或接口2>
+
+前面的形式表示 `T` 需要是指定的基类或者接口的子类，后面的形式表示 `T` 需要是指定的接口或者基类 1 的子类并且是基类或者接口 2 的子类。
+
+### 1.6 泛型的补偿
+
+#### 1.6.1 创建实例
+
+使用类型标签来获取指定类型的实例：
+
+    try {
+        Person person = Person.class.newInstance();
+    } catch (InstantiationException e) {
+        e.printStackTrace();
+    } catch (IllegalAccessException e) {
+        e.printStackTrace();
+    }
+
+但是使用上面的方式，要求指定的类型标签必须有默认的构造器。
+
+#### 1.6.2 创建数组
+
+可以使用`类型标签+Array.newInstance()`的方式实现：
+
+    int[] arr = (int[]) Array.newInstance(int.class, 5);
+
+下面的这种方式在运行时不会出错，但是在 main 方法中强制进行类型转换的时候会出错：
+
+    private static  <T> T[] createArray(T t) {
+        T[] arr = (T[]) new Object[5];
+        arr[0] = t;
+        return arr;
+    }
+
+    public static void main(String ...args) {
+        Integer[] array = createArray(5); // ClassCastException
+        System.out.println(Arrays.toString(array));
+    }
+
+这是因为它的运行时类型仍然是Object[]，写成下面的形式就不会错了：
+
+    public static void main(String ...args) {
+        Object[] array = createArray(5); // 不会出错
+        System.out.println(Arrays.toString(array));
+        Integer integer = (Integer) array[0]; // 也不会错
+        System.out.println(integer);
+    }
+
+因为有了擦除，数组的运行时类型只能是 `Object[]`。
+
+#### 1.6.3 自限定的类型
+
+    private static class SelfBounded<T extends SelfBounded<T>> {}
+
+    private static class A extends SelfBounded<A> {}
+    
+    private static class B extends SelfBounded<A> {}
+
+    private static class C extends SelfBounded {}
+
+    // private static class D extends SelfBounded<C> {}  // 错误!
+
+    // private static class E extends SelfBounded<B> {}  // 错误!
+
+    // private static class F extends SelfBounded<D> {}  // 错误!
+
+可以看出，当定义了 `class M extends SelfBounded<N>` 的时候，这里对N的要求是它的必须实现了 `SelfBounded<N>`。
+
+#### 1.6.4 泛类与子类
+
+虽然 `Object obj = new Integer(123);` 是可行的，但是 `ArraylList<Object> ao = new ArrayList<Integer>();` 是错误的。因为 `Integer` 是 `Object` 的派生类，但是 `ArrayList<Integer>` 不是 `ArraylList<Object>` 的派生类。
+
+#### 1.6.5 通配符
+
+根据上面的泛类与子类的关系，如果要实现一个函数，如
+
+    void PrintArrayList(ArrayList<Object> c){
+        for(Object obj:c){}
+    }
+
+那么 `ArrayList<Integer>(10)` 的实例是无法传入到该函数中的，因为 `ArrayList<Integer>` 和`ArrayList<Object>` 是没有继承关系的。在这种情况下就可以使用通配符解决这个问题。我们可以定义上面的函数为如下形式，这样就可以将泛型传入了。
+
+    PrintArrayList(ArrayList<?>c) {
+        for(Object obj:c){}
+    }
+
+当然，也可以指定通配符 `?` 的约束，即将其写成下面的形式
+
+    <? extends 基类>
+    <? super 派生类>
+
+就是在运行时指定擦除的边界。
+
+## 2、Class 类
+
+Class 类包含了与类某个类有关的信息，Class 也支持泛型。它们的效果是相同的，只是使用泛型具有编译器类型检查的效果，相对更加安全。
+
+以下是使用Class类的一个测试例子。在这里我们可以通过反射来获取并修改 `private方法` 和 `private字段` 的`accessible` 属性。当设置为 `true` 时，我们就可以对其进行调用或者修改。
 
 此外，我们还可以进行自定义注解以及获取类、方法和字段的注解等信息。
 
-### 示例1：获取Class对象的属性信息，修改private类型的字段，调用private的方法
+**示例 1：获取 Class 对象的属性信息，修改 private 类型的字段，调用 private 方法：**
 
     public static void main(String ...args) {
         Class<SubClass> subClass = SubClass.class;
@@ -22,12 +151,12 @@ Class类包含了与类某个类有关的信息，Class也支持泛型。它们�
             e.printStackTrace();
         }
 
-输出Class类的方法，这里输出的结果中包含了超类的方法：
+输出 Class 类的方法，这里输出的结果中包含了超类的方法：
 
         System.out.print("\nMethods:\n");
         System.out.println(Arrays.toString(subClass.getMethods()));
 
-输出Class内部定义的方法，它只输出了在SubClass中新加入的方法的定义：
+输出 Class 内部定义的方法，它只输出了在 SubClass 中新加入的方法的定义：
 
         System.out.print("\nDeclaredMethods:\n");
         System.out.println(Arrays.toString(subClass.getDeclaredMethods()));
@@ -35,12 +164,12 @@ Class类包含了与类某个类有关的信息，Class也支持泛型。它们�
         System.out.print("\nMethodInformation:\n");
         printMethodInfo(subClass);
 
-输出Class的字段，输出的结果为空：
+输出 Class 的字段，输出的结果为空：
 
         System.out.print("\nFields:\n");
         System.out.println(Arrays.toString(subClass.getFields()));
 
-输出Class中定义的字段：
+输出 Class 中定义的字段：
 
         System.out.print("\nDeclaredFields:\n");
         System.out.println(Arrays.toString(subClass.getDeclaredFields()));
@@ -206,13 +335,13 @@ Class类包含了与类某个类有关的信息，Class也支持泛型。它们�
 	[public me.shouheng.rtti.RttiTest$SubClass()]
 	package me.shouheng.rtti
 
-### 示例2：泛型参数的获取
+**示例2：泛型参数的获取：**
 
 下面是在实际的框架设计中会用到的一些方法，它尝试从类的泛型中获取泛型的名称：
 
-    private static class Model {}
+    private static class Model { }
 
-    private static class Product extends Model {}
+    private static class Product extends Model { }
 
     private static class Store<T extends Model> {
 
@@ -228,7 +357,7 @@ Class类包含了与类某个类有关的信息，Class也支持泛型。它们�
         }
     }
 
-    private static class ProductStore extends Store<Product> {}
+    private static class ProductStore extends Store<Product> { }
 
     public static void main(String ...args) {
         ProductStore store = new ProductStore();
@@ -240,11 +369,4 @@ Class类包含了与类某个类有关的信息，Class也支持泛型。它们�
 	me.shouheng.rtti.RttiTest.me.shouheng.rtti.RttiTest$Store<me.shouheng.rtti.RttiTest$Product>
 	[class me.shouheng.rtti.RttiTest$Product]
 	Product
-
-
-
-
-
-
-
 
