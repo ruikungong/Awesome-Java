@@ -16,13 +16,17 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
 
 泛型类的声明与一般类的声明语法一致，但需要在声明的泛型类名称后使用 `<>` 指定一个或多个类型参数，如：
 
+```java
     class MyClass <E> { } 或 class MyClass <K,V> { }
+```
 
 ### 1.3 泛型接口
 
 泛型接口的声明与一般接口的声明语法一致，但需要在声明的泛型接口名称后使用 `<>` 指定一个或多个类型参数，如：
 
+```java
     interface IMyMap <E> 或 intetface IMyMap <K,V> 
+```
 
 ### 1.4 泛型方法
 
@@ -34,7 +38,9 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
 
 ### 1.5 泛型参数的约束
 
+```java
     <T extends 基类或接口> 或 <T extends 基类或接口1 & 基类或接口2>
+```
 
 前面的形式表示 `T` 需要是指定的基类或者接口的子类，后面的形式表示 `T` 需要是指定的接口或者基类 1 的子类并且是基类或者接口 2 的子类。
 
@@ -44,6 +50,7 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
 
 使用类型标签来获取指定类型的实例：
 
+```java
     try {
         Person person = Person.class.newInstance();
     } catch (InstantiationException e) {
@@ -51,6 +58,7 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
     } catch (IllegalAccessException e) {
         e.printStackTrace();
     }
+```
 
 但是使用上面的方式，要求指定的类型标签必须有默认的构造器。
 
@@ -58,10 +66,13 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
 
 可以使用`类型标签+Array.newInstance()`的方式实现：
 
+```java
     int[] arr = (int[]) Array.newInstance(int.class, 5);
+```
 
 下面的这种方式在运行时不会出错，但是在 main 方法中强制进行类型转换的时候会出错：
 
+```java
     private static  <T> T[] createArray(T t) {
         T[] arr = (T[]) new Object[5];
         arr[0] = t;
@@ -72,20 +83,24 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
         Integer[] array = createArray(5); // ClassCastException
         System.out.println(Arrays.toString(array));
     }
+```
 
 这是因为它的运行时类型仍然是Object[]，写成下面的形式就不会错了：
 
+```java
     public static void main(String ...args) {
         Object[] array = createArray(5); // 不会出错
         System.out.println(Arrays.toString(array));
         Integer integer = (Integer) array[0]; // 也不会错
         System.out.println(integer);
     }
+```
 
 因为有了擦除，数组的运行时类型只能是 `Object[]`。
 
 #### 1.6.3 自限定的类型
 
+```java
     private static class SelfBounded<T extends SelfBounded<T>> {}
 
     private static class A extends SelfBounded<A> {}
@@ -99,6 +114,7 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
     // private static class E extends SelfBounded<B> {}  // 错误!
 
     // private static class F extends SelfBounded<D> {}  // 错误!
+```
 
 可以看出，当定义了 `class M extends SelfBounded<N>` 的时候，这里对N的要求是它的必须实现了 `SelfBounded<N>`。
 
@@ -110,20 +126,26 @@ Java泛型是使用类型擦除来实现的。它的好处只是提供了编译�
 
 根据上面的泛类与子类的关系，如果要实现一个函数，如
 
+```java
     void PrintArrayList(ArrayList<Object> c){
         for(Object obj:c){}
     }
+```
 
 那么 `ArrayList<Integer>(10)` 的实例是无法传入到该函数中的，因为 `ArrayList<Integer>` 和`ArrayList<Object>` 是没有继承关系的。在这种情况下就可以使用通配符解决这个问题。我们可以定义上面的函数为如下形式，这样就可以将泛型传入了。
 
+```java
     PrintArrayList(ArrayList<?>c) {
         for(Object obj:c){}
     }
+```
 
 当然，也可以指定通配符 `?` 的约束，即将其写成下面的形式
 
+```java
     <? extends 基类>
     <? super 派生类>
+```
 
 就是在运行时指定擦除的边界。
 
@@ -137,6 +159,7 @@ Class 类包含了与类某个类有关的信息，Class 也支持泛型。它�
 
 **示例 1：获取 Class 对象的属性信息，修改 private 类型的字段，调用 private 方法：**
 
+```java
     public static void main(String ...args) {
         Class<SubClass> subClass = SubClass.class;
 
@@ -297,9 +320,11 @@ Class 类包含了与类某个类有关的信息，Class 也支持泛型。它�
     }
 
     private interface Interface {}
+```
 
 输出结果：
 
+```java
 	Methods:
 	[public java.lang.String me.shouheng.rtti.RttiTest$SubClass.getName(), public void me.shouheng.rtti.RttiTest$SubClass.setName(java.lang.String), public me.shouheng.rtti.RttiTest$SuperClass me.shouheng.rtti.RttiTest$SubClass.getSup(), public void me.shouheng.rtti.RttiTest$SubClass.setSup(me.shouheng.rtti.RttiTest$SuperClass), public final void java.lang.Object.wait() throws java.lang.InterruptedException, public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException, public final native void java.lang.Object.wait(long) throws java.lang.InterruptedException, public boolean java.lang.Object.equals(java.lang.Object), public java.lang.String java.lang.Object.toString(), public native int java.lang.Object.hashCode(), public final native java.lang.Class java.lang.Object.getClass(), public final native void java.lang.Object.notify(), public final native void java.lang.Object.notifyAll()]
 	
@@ -334,11 +359,13 @@ Class 类包含了与类某个类有关的信息，Class 也支持泛型。它�
 	[interface me.shouheng.rtti.RttiTest$Interface]
 	[public me.shouheng.rtti.RttiTest$SubClass()]
 	package me.shouheng.rtti
+```
 
 **示例2：泛型参数的获取：**
 
 下面是在实际的框架设计中会用到的一些方法，它尝试从类的泛型中获取泛型的名称：
 
+```java
     private static class Model { }
 
     private static class Product extends Model { }
@@ -362,11 +389,13 @@ Class 类包含了与类某个类有关的信息，Class 也支持泛型。它�
     public static void main(String ...args) {
         ProductStore store = new ProductStore();
     }
+```
 
 输出结果：
 
+```java
 	class me.shouheng.rtti.RttiTest$ProductStore
 	me.shouheng.rtti.RttiTest.me.shouheng.rtti.RttiTest$Store<me.shouheng.rtti.RttiTest$Product>
 	[class me.shouheng.rtti.RttiTest$Product]
 	Product
-
+```
