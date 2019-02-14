@@ -79,7 +79,7 @@ synchronized 先天具有重入性：在执行 sychronized 指令时，首先要
 除了使用 sychronized，我们还可以使用 JUC 中的 ReentrantLock 来实现同步，它与 sychronized 类似，区别主要表现在以下 3 个方面：
 
 1. 等待可中断：当持有锁的线程长期不释放锁的时候，正在等待的线程可以选择放弃等待。ReentrantLock 使用 CAS 实现，可以在获取锁的时候设置一个超时的时间，当到达了指定的时间仍然没有获取到锁可以放弃获取锁。
-2. 公平锁：多个线程等待同一个锁时，必须按照申请锁的时间顺序来依次获得锁；而非公平锁无法保证，当锁被释放时任何在等待的线程都可以获得锁。sychronized 本身时非公平锁，而 ReentrantLock 默认是非公平的，可以通过构造函数要求其为公平的。公平锁和非公平锁对应于 ReentrantLock 中的两个内部类，
+2. 公平锁：多个线程等待同一个锁时，必须按照申请锁的时间顺序来依次获得锁；而非公平锁无法保证，当锁被释放时任何在等待的线程都可以获得锁。sychronized 本身时非公平锁，而 ReentrantLock 默认是非公平的，可以通过构造函数要求其为公平的。
 3. 锁可以绑定多个条件：ReentrantLock 可以绑定多个 Condition 对象，而 sychronized 要与多个条件关联就不得不加一个锁，ReentrantLock 只要多次调用 newCondition 即可。
 
 在 JDK1.5 之前，sychronized 在多线程环境下比 ReentrantLock 要差一些，但是在 JDK1.6 以上，虚拟机对 sychronized 的性能进行了优化，性能不再是使用 ReentrantLock 替代 sychronized 的主要因素。
