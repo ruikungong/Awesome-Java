@@ -24,39 +24,24 @@
 
 *Java语言的基础理论知识*
 
-* [基础](Java语言和JDK源码/基础.md)
-* [数据类型](Java语言和JDK源码/数据类型.md)
-* [运算符](Java语言和JDK源码/运算符.md)
-* [类-对象-接口](Java语言和JDK源码/类-对象-接口.md)
-* [枚举](Java语言和JDK源码/枚举.md)
-* [字符串](Java语言和JDK源码/字符串.md)
-* [数组](Java语言和JDK源码/数组.md)
-* [Object](Java语言和JDK源码/Object.md)
-* [Class](Java语言和JDK源码/Class.md)
-* [泛型](Java语言和JDK源码/泛型.md)
-* [异常](Java语言和JDK源码/异常.md)
-* [Java 注解及其两种使用方法](Java语言和JDK源码/注解.md)
+* [Java 基础回顾-1：基础总结](Java语言和JDK源码/Java基础回顾_1_基础总结.md)
+* [Java 基础回顾-2：面向对象](Java语言和JDK源码/Java基础回顾_2_面向对象.md)
+* [Java 基础回顾-3：泛型和 Class 类](Java语言和JDK源码/Java基础回顾_3_泛型和Class类.md)
+* [Java 基础回顾-4：几个预定义类](Java语言和JDK源码/Java基础回顾_4_几个预定义类.md)
+* [Java 基础回顾-5：容器概览](Java语言和JDK源码/Java基础回顾_5_容器概览.md)
+* [Java 基础回顾-6：HashMap 源码阅读](Java语言和JDK源码/Java基础回顾_6_HashMap源码阅读.md)
+* [Java 基础回顾-7：基础 IO 框架](Java语言和JDK源码/Java基础回顾_7_IO.md)
+* [Java 基础回顾-x：注解及其两种使用方法](https://juejin.im/post/5b824b8751882542f105447d)
 
 <h3 id="concurrent">并发编程</h3>
 
 *Java并发编程相关的内容，并发包源码分析等*
 
-* [ThreadLocal原理分析](Java语言和JDK源码/并发编程/ThreadLocal原理分析.md)
-* [多线程编程](Java语言和JDK源码/并发编程/多线程编程.md)
-* [生产者消费者模式](Java语言和JDK源码/并发编程/生产者消费者模式.md)
-
-<h3 id="collection">集合框架</h3>
-
-*Java集合框架，并发容器，同步容器等*
-
-* [Java容器概览](Java语言和JDK源码/集合框架/Java容器概览.md)
-
-<h3 id="java-io">IO框架</h3>
-
-*Java基础字节流 字符流 NIO等*
-
-* [基础IO](Java语言和JDK源码/IO编程/基础IO.md)
-* [高级IO](Java语言和JDK源码/IO编程/高级IO.md)
+* [并发编程专题-1：基础](Java语言和JDK源码/并发编程/并发编程专题1_基础.md)
+* [并发编程专题-2：使用线程](Java语言和JDK源码/并发编程/并发编程专题2_使用线程.md)
+* [并发编程专题-3：synchronized 原理分析](Java语言和JDK源码/并发编程/并发编程专题3_synchronized.md)
+* [并发编程专题-4：ThreadLocal 原理分析](Java语言和JDK源码/并发编程/并发编程专题4_ThreadLocal原理分析.md)
+* [并发编程专题-5：生产者消费者模式](Java语言和JDK源码/并发编程/并发编程专题5_生产者消费者模式.md)
 
 <h3 id="java-8">Java8</h3>
 
@@ -69,21 +54,21 @@
 
 *Java虚拟机相关，内存模型，类加载机制，JVM性能解析等*
 
-* [JVM扫盲—虚拟机内存管理](JVM/JVM扫盲—虚拟机内存管理.md)
-* [JVM扫盲—虚拟机执行子系统](JVM/JVM扫盲—虚拟机执行子系统.md)
-* [JVM扫盲—虚拟机内存模型](JVM/JVM扫盲—虚拟机内存模型与高效并发.md)
+* [JVM 扫盲—虚拟机内存管理](JVM/JVM扫盲—虚拟机内存管理.md)
+* [JVM 扫盲—虚拟机执行子系统](JVM/JVM扫盲—虚拟机执行子系统.md)
+* [JVM 扫盲—虚拟机内存模型](JVM/JVM扫盲—虚拟机内存模型与高效并发.md)
 
 *零散的文章*
 
-* [Java基本概述](JVM/1.Java基本概述.md)
-* [Java内存区域和内存溢出异常](JVM/2.Java内存区域和内存溢出异常.md)
+* [Java 基本概述](JVM/1.Java基本概述.md)
+* [Java 内存区域和内存溢出异常](JVM/2.Java内存区域和内存溢出异常.md)
 * [垃圾收集器与内存分配策略](JVM/3.垃圾收集器与内存分配策略.md)
 * [虚拟机性能监控与故障分析工具](JVM/4.虚拟机性能监控与故障分析工具.md)
 * [类文件结构](JVM/5.类文件结构.md)
 * [虚拟机类加载机制](JVM/6.虚拟机类加载机制.md)
 * [虚拟机字节码执行引擎](JVM/7.虚拟机字节码执行引擎.md)
-* [Java内存模型与线程](JVM/8.Java内存模型与线程.md)
-* [EclipseMemoryAnalyzer使用](JVM/EclipseMemoryAnalyzer使用.md)
+* [Java 内存模型与线程](JVM/8.Java内存模型与线程.md)
+* [EclipseMemoryAnalyzer 使用](JVM/EclipseMemoryAnalyzer使用.md)
 
 <h3 id="data-structure">数据结构与算法</h3>
 

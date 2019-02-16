@@ -1,4 +1,4 @@
-# Java 基础回顾：容器类
+# Java 基础回顾-5：容器类
 
 ## 0、基础
 
@@ -312,32 +312,42 @@ public class TreeSet<E> extends AbstractSet<E>
 
 ### 3.1 HashMap
 
-
+因为 HashMap 的源码比较重要，而且需要很长的篇幅来进行分析，我们将其作为一个单独的文章：[《Java 基础回顾-6：HashMap 源码分析》](https://blog.csdn.net/github_35186068/article/details/87386841)。
 
 ### 3.2 HashTable
 
 相比于HashMap，HashTable的实现就显得简单得多。它内部同样自己定义了一个结点：
 
+```java
     private static class Entry<K,V> implements Map.Entry<K,V> {
         final int hash;
         final K key;
         V value;
         Entry<K,V> next;
     }
+```
 
-而且也是采用了基于拉链阀的碰撞处理机制。它定义了一个
+而且也是采用了基于**拉链法**的碰撞处理机制。它定义了一个
 
+```java
     private transient Entry<?,?>[] table;
+```
 
 下面是它的根据哈希码计算数组的索引的方法：
 
+```java
     Entry<?,?> tab[] = table;
     int hash = key.hashCode();
     int index = (hash & 0x7FFFFFFF) % tab.length;
+```
 
 虽然，当插入的元素的数量超过指定的阈值的时候，它也会重新调整数组的大小。但是它的插入操作中是不存在将链表改变成红黑树的优化的。并且这里直接使用了取余的方式获取索引，不存在扰动，从而也不会强制要求容量必须为2的整数次幂。
 
-因为它的散列的均匀性没有HashMap调节得那么好，所以它的性能可能会比HashMap要差一些。而且，它的每个方法上面都加了sychronized关键字进行修饰，这样虽然保证了在多线程环境中的数据一致性，但是，在非多线程环境中，无疑是一种不必要的开销。
+因为它的散列的均匀性没有 HashMap 调节得那么好，所以它的性能可能会比 HashMap 要差一些。而且，它的每个方法上面都加了 sychronized 关键字进行修饰，这样虽然保证了在多线程环境中的数据一致性，但是，在非多线程环境中，无疑是一种不必要的开销。
+
+### 3.3 TreeMap
+
+TreeMap 是基于红黑树实现的，增删改查都是对红黑树的操作。
 
 ## 4、同步容器
 

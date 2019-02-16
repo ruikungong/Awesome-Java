@@ -1,6 +1,6 @@
 # ThreadLocal的使用及其源码实现
 
-## 1、ThreadLocal的使用
+## 1、ThreadLocal 的使用
 
 防止任务在共享资源上产生冲突的一种方式是根除对变量的共享，使用线程的本地存储为使用相同变量的不同线程创建不同的存储。
 
@@ -63,7 +63,7 @@
     }
 ```
 
-这里首先会再步骤1中获取到当前线程的实例，然后在步骤2中通过`getMap()`方法，使用当前的线程的`ThreadLocalMap`。这里的`ThreadLocalMap`的定义如下：
+这里首先会再步骤1中获取到当前线程的实例，然后在步骤2中通过 `getMap()` 方法，使用当前的线程的 `ThreadLocalMap`。这里的 `ThreadLocalMap` 的定义如下：
 
 ```java
     static class ThreadLocalMap {
@@ -91,7 +91,7 @@
     }
 ```
 
-然后，我们看下`getMap()`方法的定义：
+然后，我们看下 `getMap()` 方法的定义：
 
 ```java
     ThreadLocalMap getMap(Thread t) {
@@ -105,22 +105,22 @@
 
 这里的关系是不是有点乱，我们来捋一下：
 
-我们使用`ThreadLocal`存储的值实际是存储在`Thread`使用`ThreadLocalMap`当中的，而这里的`ThreadLocal`实例值起到了一个哈希表的键的作用：
+我们使用 `ThreadLocal` 存储的值实际是存储在 `Thread` 使用 `ThreadLocalMap` 当中的，而这里的 `ThreadLocal` 实例值起到了一个哈希表的键的作用：
 
 ![ThreadLocal](https://user-gold-cdn.xitu.io/2018/7/10/16484c37c286069f?w=1276&h=473&f=png&s=19243)
 
-就像上图显示的那样，假如我们在线程`thread1`中调用了`threadLocal1`的`get()`方法，首先会用`Thread.currentThread()`方法获取到`thread1`，然后获取到`thread1`的`threadLocals`实例，`threadLocals`是一个`ThreadLocalMap`类型的哈希表。然后，我们再用`threadLocal1`作为键来从`threadLocals`中获取到值`Entry`，并从`Entry`中取出存储的值并返回。
+就像上图显示的那样，假如我们在线程 `thread1` 中调用了 `threadLocal1` 的 `get()` 方法，首先会用 `Thread.currentThread()` 方法获取到 `thread1`，然后获取到 `thread1` 的 `threadLocals` 实例，`threadLocals` 是一个 `ThreadLocalMap` 类型的哈希表。然后，我们再用 `threadLocal1` 作为键来从 `threadLocals` 中获取到值 `Entry`，并从 `Entry` 中取出存储的值并返回。
 
-至此，我们已经了解了ThreadLocal的实现的原理，本来想看下`set()`方法的，但是到此已经基本真相大白了，所以也就没有继续下去的必要了。
+至此，我们已经了解了 ThreadLocal 的实现的原理，本来想看下 `set()` 方法的，但是到此已经基本真相大白了，所以也就没有继续下去的必要了。
 
 ## 3、总结
 
 我们回过头来看下之前提出的几个问题：
 
-1. ThreadLocal中存储的值是如何保证绝对的线程安全的？
-实际上每个值都是存在线程内部的，ThreadLocal只用来帮助我们从该线程内部的哈希表中找到存放的那个值。
+1. ThreadLocal 中存储的值是如何保证绝对的线程安全的？
+实际上每个值都是存在线程内部的，ThreadLocal 只用来帮助我们从该线程内部的哈希表中找到存放的那个值。
 2. 那么这些值是存储在什么地方？线程内部的实例字段。
 3. 是静态类型的还是实例类型的？线程内部的实例字段。
 4. 如果某个线程执行完毕了，被销毁了，那么这些存储的值会被怎么处理呢？因为是线程的局部字段，所以线程不在了，值就没有了。
 
-以上就是ThreadLocal的用法和实现原理。
+以上就是 ThreadLocal 的用法和实现原理。
